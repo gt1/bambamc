@@ -1,0 +1,11 @@
+This package contains mainly a lightwight C implementation of the read name
+collation code from the larger bambam C++ project (see
+ftp://ftp.sanger.ac.uk/pub/users/gt1). bambamc currently requires the the
+samtools library. To compile bambamc you first need to compile samtools and
+then point the configure script of bambamc to the samtools directory using
+the --with-samtools=<dir> option. On recent versions of Ubuntu the samtools
+library can be installed via the libbam-dev package (sudo apt-get
+install libbam-dev). If this package is installed, the bambac configure
+script should automatically find the library without any need for using
+--with-samtools.
+

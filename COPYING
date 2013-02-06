@@ -1,0 +1,7 @@
+The hashing code in the source file src/bambamc/BamBam_Hash.c is by Bob
+Jenkins. This code is in the public domain (please see the corresponding
+remarks in src/bambamc/BamBam_Hash.c).
+
+The rest of the code is by German Tischler and distributed under version 3 of 
+the GNU General Public License (see file GPLv3, which is part of the distribution).
+The single source files denote the respective copyright ownerships.
