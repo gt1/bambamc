@@ -16,10 +16,9 @@ AM_PROG_CC_C_O
 
 AC_LANG_ASSERT([C])
 
-PKG_PROG_PKG_CONFIG
-
 AC_HEADER_STDC
 
+PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([zlib],[zlib >= 0],[zlibpkg=yes],[zlibpkg=no])
 
 if [[ "${zlibpkg}" = "yes" ]] ; then
