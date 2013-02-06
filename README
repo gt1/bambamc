@@ -5,7 +5,7 @@ samtools library. To compile bambamc you first need to compile samtools and
 then point the configure script of bambamc to the samtools directory using
 the --with-samtools=<dir> option. On recent versions of Ubuntu the samtools
 library can be installed via the libbam-dev package (sudo apt-get
-install libbam-dev). If this package is installed, the bambac configure
+install libbam-dev). If this package is installed, the bambamc configure
 script should automatically find the library without any need for using
 --with-samtools.
 
