@@ -23,7 +23,15 @@
 #include <bambamc/BamBam_Unused.h>
 #include <bambamc/BamBam_BamCollationTempFileGenerator.h>
 #include <bambamc/BamBam_Hash.h>
-#include "bam.h"
+
+#include <bambamc/BamBam_Config.h>
+
+#if defined(HAVE_SAM_H)
+#include <sam.h>
+#endif
+#if defined(HAVE_SAMTOOLS_SAM_H)
+#include <samtools/sam.h>
+#endif
 
 typedef struct _BamBam_BamCollationHashEntry
 {

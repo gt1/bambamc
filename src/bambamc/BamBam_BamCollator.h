@@ -27,7 +27,15 @@
 #include <bambamc/BamBam_MergeHeapEntry.h>
 #include <bambamc/BamBam_BamHeader.h>
 #include <bambamc/BamBam_BamHeaderInfo.h>
-#include "sam.h"
+
+#include <bambamc/BamBam_Config.h>
+
+#if defined(HAVE_SAM_H)
+#include <sam.h>
+#endif
+#if defined(HAVE_SAMTOOLS_SAM_H)
+#include <samtools/sam.h>
+#endif
 
 typedef struct _BamBam_BamCollator
 {

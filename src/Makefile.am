@@ -24,7 +24,7 @@ libbambamc_include_HEADERS= \
 	bambamc/BamBam_BamCollator.h			bambamc/BamBam_CharBuffer.h		    bambamc/BamBam_ListNode.h \
 	bambamc/BamBam_BamCollatorInterface.h		bambamc/BamBam_Chromosome.h		    bambamc/BamBam_MergeHeapEntry.h \
 	bambamc/BamBam_BamFileDecoder.h			bambamc/BamBam_CollatorState.h		    bambamc/BamBam_Unused.h \
-	bambamc/BamBam_BamFileHeader.h			bambamc/BamBam_FastQRead.h
+	bambamc/BamBam_BamFileHeader.h			bambamc/BamBam_FastQRead.h                  bambamc/BamBam_Config.h
 libbambamc_la_CPPFLAGS=${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
 libbambamc_la_LDFLAGS=-static -rpath $(libdir)
 

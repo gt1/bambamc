@@ -155,12 +155,13 @@ if [[ "${with_samtools}" != "no" ]] ; then
 	CPPFLAGS="${CPPFLAGS} ${SAMTOOLSCPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${SAMTOOLSLDFLAGS}"
 
-	AC_CHECK_HEADER(bam.h, [bam_h=yes], [bam_h=no])
+	AC_CHECK_HEADER(sam.h, [sam_h=yes], [sam_h=no])
+	AC_CHECK_HEADER(samtools/sam.h, [samtools_sam_h=yes], [samtools_sam_h=no])
 
 	CPPFLAGS="${CPPFLAGSSAVE}"
 	LDFLAGS="${LDFLAGSSAVE}"
 
-	if test "${bam_h}" = "yes" ; then
+	if test "${sam_h}" = "yes" -o "${samtools_sam_h}" = "yes" ; then
 		CPPFLAGSSAVE="${CPPFLAGS}"
 		LDFLAGSSAVE="${LDFLAGS}"
 		LIBSSAVE="${LIBS}"
@@ -168,27 +169,44 @@ if [[ "${with_samtools}" != "no" ]] ; then
 		LDFLAGS="${LDFLAGS} ${SAMTOOLSLDFLAGS}"
 		LIBS="${LIBS} ${SAMTOOLSLIBS}"
 
-		AC_MSG_CHECKING([whether we can compile a program using bam.h])
-			AC_LINK_IFELSE([#include <bam.h>
+		if test "${sam_h}" = "yes" ; then
+			SAMHEADER="sam.h"
+			SAMHEADERDEFINE="#define HAVE_SAM_H"
+			CPPFLAGS="${CPPFLAGS} -DHAVE_SAM_H"
+		fi
+		if test "${samtools_sam_h}" = "yes" ; then
+			SAMHEADER="samtools/sam.h"
+			SAMHEADERDEFINE="#define HAVE_SAMTOOLS_SAM_H"
+			CPPFLAGS="${CPPFLAGS} -DHAVE_SAMTOOLS_SAM_H"
+		fi
+
+		AC_MSG_CHECKING([whether we can compile a program using ${SAMHEADER}])
+			AC_LINK_IFELSE([
+#if defined(HAVE_SAM_H)
+#include <sam.h>
+#endif
+#if defined(HAVE_SAMTOOLS_SAM_H)
+#include <samtools/sam.h>
+#endif
 
 				int main() {
-					sam_open("reads.bam");
+					sam_open("reads.sam");
 					return 0;
 			}],
-			have_bam=yes,
-			have_bam_h=no
+			have_sam=yes,
+			have_sam=no
 		)
 
-		AC_MSG_RESULT($bam_h)
+		AC_MSG_RESULT($have_sam)
 		CPPFLAGS="${CPPFLAGSSAVE}"
 		LDFLAGS="${LDFLAGSSAVE}"
 		LIBS="${LIBSSAVE}"
 
-		if test "${have_bam}" = "no" ; then
+		if test "${have_sam}" = "no" ; then
 			AC_MSG_ERROR(["Compiling test program failed, aborting.])
 		fi
 	else
-		AC_MSG_ERROR([Header bam.h not found. Please set --with-samtools accordingly])
+		AC_MSG_ERROR([Header sam.h not found. Please set --with-samtools accordingly])
 	fi
 else
 	AC_MSG_ERROR([Compiled samtools/lib required. Please set --with-samtools accordingly])
@@ -205,4 +223,5 @@ AC_SUBST([SAMTOOLSLIBS])
 AC_SUBST([ZLIBCPPFLAGS])
 AC_SUBST([ZLIBLIBS])
 AC_SUBST([ZLIBREQ])
-AC_OUTPUT(Makefile src/Makefile ubuntu.sh bambamc.pc)
+AC_SUBST([SAMHEADERDEFINE])
+AC_OUTPUT(Makefile src/Makefile ubuntu.sh bambamc.pc src/bambamc/BamBam_Config.h)
