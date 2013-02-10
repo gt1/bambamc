@@ -3,7 +3,7 @@ AC_CANONICAL_SYSTEM
 AC_PROG_LIBTOOL
 
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(bambamc,0.0.27)
+AM_INIT_AUTOMAKE
 AC_CONFIG_MACRO_DIR([m4])
 
 # check for c compiler
@@ -181,7 +181,7 @@ if [[ "${with_samtools}" != "no" ]] ; then
 		fi
 
 		AC_MSG_CHECKING([whether we can compile a program using ${SAMHEADER}])
-			AC_LINK_IFELSE([
+			AC_LINK_IFELSE([AC_LANG_SOURCE([
 #if defined(HAVE_SAM_H)
 #include <sam.h>
 #endif
@@ -192,7 +192,7 @@ if [[ "${with_samtools}" != "no" ]] ; then
 				int main() {
 					sam_open("reads.sam");
 					return 0;
-			}],
+			}])],
 			have_sam=yes,
 			have_sam=no
 		)
