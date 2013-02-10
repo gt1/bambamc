@@ -9,3 +9,9 @@ install libbam-dev). If this package is installed, the bambamc configure
 script should automatically find the library without any need for using
 --with-samtools.
 
+The gibhub repository does not contain the final configure script but only
+the source files passed to autoconf/automake. Please use
+
+autoreconf -i -f
+
+to obtain a set of working configuration scripts.
