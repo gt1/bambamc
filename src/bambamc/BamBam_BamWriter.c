@@ -19,6 +19,9 @@
 
 #include <bambamc/BamBam_BamWriter.h>
 #include <bambamc/BamBam_BamAlignmentPut.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 BamBam_BamWriter * BamBam_BamWriter_Delete(BamBam_BamWriter * writer)
 {

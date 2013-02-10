@@ -19,6 +19,7 @@
 #include <bambamc/BamBam_GzipReader.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 BamBam_GzipReader * BamBam_GzipReader_New_Filename(char const * filename)
 {
