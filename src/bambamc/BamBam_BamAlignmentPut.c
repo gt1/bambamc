@@ -115,6 +115,16 @@ int BamBam_CharBuffer_PutAlignment(
 	/* terminating zero */
 	BamBam_CharBuffer_PushCharQuick(buffer,0,ret); if ( ret < 0 ) return ret;
 
+	/* if cigar string is "*", then skip it */
+	if ( 
+		ret >= 0 && 
+		cigar[0] && 
+		(!cigar[1]) &&
+		(cigar[0] == '*')
+	)
+	{
+		++cigar;
+	}
 	/* encode cigar string */
 	while ( ret >= 0 && *cigar )
 	{
