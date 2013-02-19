@@ -95,12 +95,16 @@ BamBam_BamHeaderInfo * BamBam_BamHeaderInfo_New(char const * version, char const
 		return BamBam_BamHeaderInfo_Delete(info);
 	
 	if ( plaintext )
+	{
 		info->plaintext = strdup(plaintext);
+
+		if ( ! info->plaintext )
+			return BamBam_BamHeaderInfo_Delete(info);
+	}
 	else
+	{
 		info->plaintext = 0;
-	
-	if ( ! info->plaintext )
-		return BamBam_BamHeaderInfo_Delete(info);
+	}
 		
 	info->cb = BamBam_CharBuffer_New();
 	
