@@ -629,6 +629,9 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 	if ( ! collator->bamfile )
 		return BamBam_BamCollator_Delete(collator);
 
+	if ( ! collator->bamfile->header )
+		return BamBam_BamCollator_Delete(collator);
+
 	collator->bamheader = collator->bamfile->header;
 	
 	if ( ! collator->bamheader->l_text )

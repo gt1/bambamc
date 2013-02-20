@@ -1,4 +1,4 @@
-AC_INIT(bambamc,0.0.28,[gt1@sanger.ac.uk],[bambamc],[http://www.sanger.ac.uk])
+AC_INIT(bambamc,0.0.29,[gt1@sanger.ac.uk],[bambamc],[http://www.sanger.ac.uk])
 AC_CANONICAL_SYSTEM
 AC_PROG_LIBTOOL
 
