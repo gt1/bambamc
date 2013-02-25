@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS=-I m4
 
 lib_LTLIBRARIES = libbambamc.la
-noinst_PROGRAMS = bamreadertest
+noinst_PROGRAMS = bamreadertest bamwritertest
 
 libbambamc_la_SOURCES = \
 	bambamc/BamBam_BamCollationHash.c		bambamc/BamBam_BamCollatorInterface.c  bambamc/BamBam_FormatAlignment.c \
@@ -31,3 +31,7 @@ libbambamc_la_LDFLAGS=-static -rpath $(libdir)
 bamreadertest_SOURCES = test/bamreadertest.c
 bamreadertest_CPPFLAGS = ${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
 bamreadertest_LDADD = libbambamc.la ${SAMTOOLSLDFLAGS} ${SAMTOOLSLIBS}
+
+bamwritertest_SOURCES = test/bamwritertest.c
+bamwritertest_CPPFLAGS = ${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
+bamwritertest_LDADD = libbambamc.la ${SAMTOOLSLDFLAGS} ${SAMTOOLSLIBS}

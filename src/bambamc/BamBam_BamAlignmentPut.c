@@ -138,7 +138,7 @@ int BamBam_CharBuffer_PutAlignment(
 			num *= 10;
 			num += (*(cigar++)) - '0';
 		}
-			
+		
 		assert ( *cigar );
 		switch ( *cigar )
 		{
