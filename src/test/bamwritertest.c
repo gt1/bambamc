@@ -16,14 +16,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#include <bambamc/BamBam_BamCollator.h>
-#include <bambamc/BamBam_FormatAlignment.h>
-#include <assert.h>
 
 #include <bambamc/BamBam_BamHeaderInfo.h>
 #include <bambamc/BamBam_BamWriter.h>
-
-// BamBam_BamHeaderInfo_New(char const * version, char const * sortorder, char const * plaintext)
+#include <assert.h>
 
 int main()
 {
