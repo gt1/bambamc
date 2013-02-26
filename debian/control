@@ -1,0 +1,11 @@
+Source: bambamc
+Maintainer: German Tischler <gt1@sanger.ac.uk>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 7), libbam-dev (>= 0.1.18)
+
+Package: bambamc
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: bambamc
