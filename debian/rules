@@ -6,4 +6,5 @@ export DH_VERBOSE=1
 
 override_dh_auto_configure:
 	@echo "Running configure in $PWD"
+	@ls
 	dh_auto_configure -- --prefix=/usr
