@@ -1,4 +1,10 @@
 
+    The hashing code in the source file src/bambamc/BamBam_Hash.c is by Bob
+    Jenkins. This code is in the public domain (please see the corresponding
+    remarks in src/bambamc/BamBam_Hash.c).
+
+    The following copyright applies to the rest of bambamc:
+
     bambamc
     Copyright (C) 2009-2013 German Tischler
     Copyright (C) 2011-2013 Genome Research Limited
