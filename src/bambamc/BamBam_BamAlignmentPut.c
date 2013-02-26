@@ -221,32 +221,6 @@ int BamBam_CharBuffer_PutAlignment(
 	alignment->core.bin = bam_reg2bin(alignment->core.pos, bam_calend(&(alignment->core), bam1_cigar(alignment)));
 	
 	return ret;
-
-	#if 0	
-	#if 0
-	putAuxNumber("AS",'i',42);
-	#endif
-	
-	#if 0
-	putAuxNumber("XA",'f',42.0f);
-	putAuxNumber("XB",'c',5);
-	putAuxNumber("XC",'C',6);
-	putAuxNumber("XD",'s',7);
-	putAuxNumber("XE",'S',8);
-	putAuxNumber("XF",'I',16);
-	putAuxNumber("XG",'i',-53);
-	putAuxString("XH","Hier kommt die Maus");
-	
-	std::vector<int> V;
-	V.push_back(1);
-	V.push_back(42);
-	V.push_back(11);
-	putAuxNumberArray("XI",'i',V);
-
-	putAuxNumber("XJ",'i',-4221);
-	putAuxNumberArray("XK",'S',V);
-	#endif
-	#endif
 }
 
 int BamBam_CharBuffer_PutAuxNumber(BamBam_AlignmentPut * aput, char const * tag, char const type, void const * pvalue)
