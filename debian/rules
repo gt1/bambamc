@@ -1,12 +1,7 @@
 #!/usr/bin/make -f
-export DH_VERBOSE=1
-
 %:
 	dh $@ 
 
 override_dh_auto_configure:
-	@echo "Running configure in ${PWD}"
-	@ls
 	autoreconf -i -f
-	@ls
 	dh_auto_configure -- --prefix=/usr
