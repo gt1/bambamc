@@ -4,4 +4,4 @@
 
 override_dh_auto_configure:
 	autoreconf -i -f
-	dh_auto_configure -- --prefix=/usr
+	dh_auto_configure
