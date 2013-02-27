@@ -102,9 +102,17 @@ AC_ARG_ENABLE(profile,
 AC_ARG_ENABLE(fast,
         AS_HELP_STRING([--enable-fast],[disable evaluation of assertions (default no)]),
         [fast=${enableval}],[fast=no])
+AC_ARG_ENABLE(bamonly,
+       AS_HELP_STRING([--enable-bamonly],[support bam only, no sam (default yes)]),
+        [bamonly=${enableval}],[bamonly=yes])
 
 if test "${fast}" = "yes" ; then
 	CPPFLAGS="${CPPFLAGS} -DNDEBUG"
+fi
+
+BAMONLYDEFINE=
+if test "${bamonly}" = "yes" ; then
+	BAMONLYDEFINE="#define BAMBAMC_BAMONLY"
 fi
 
 if test "${debug}" = "yes" ; then
@@ -224,4 +232,5 @@ AC_SUBST([ZLIBCPPFLAGS])
 AC_SUBST([ZLIBLIBS])
 AC_SUBST([ZLIBREQ])
 AC_SUBST([SAMHEADERDEFINE])
+AC_SUBST([BAMONLYDEFINE])
 AC_OUTPUT(Makefile src/Makefile ubuntu.sh bambamc.pc src/bambamc/BamBam_Config.h)

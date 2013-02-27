@@ -18,11 +18,13 @@
 **/
 
 #include <bambamc/BamBam_FormatAlignment.h>
+#include <bambamc/BamBam_BamSingleAlignment.h>
+#include <bambamc/BamBam_BamFlagBase.h>
 #include <ctype.h>
 
 static uint64_t BamBam_GetFastqNameLineLength(unsigned int const qnamelen, uint32_t const flags)
 {
-	return 1 /* @ */ + qnamelen + (( flags & BAM_FPAIRED ) ? 2 : 0) /* /[12] */ + 1 /* \n */;
+	return 1 /* @ */ + qnamelen + (( flags & BAMBAMC_FPAIRED ) ? 2 : 0) /* /[12] */ + 1 /* \n */;
 }
 static uint64_t BamBam_GetFastqSeqLineLength(unsigned int const seqlen)
 {
@@ -48,7 +50,13 @@ static uint64_t BamBam_GetFastqEntryLength(unsigned int const qnamelen, unsigned
 /**
  * put fastq @ line
  **/
-static char * BamBam_PutAtLine(char const * qname, unsigned int const qnamelen, uint32_t const flags, char * opc, char const term)
+static char * BamBam_PutAtLine(
+	char const * qname, 
+	unsigned int const qnamelen, 
+	uint32_t const flags, 
+	char * opc, 
+	char const term
+)
 {
 	static int spaceTable[256];
 	static int spaceTableInitialized = 0;
@@ -66,13 +74,13 @@ static char * BamBam_PutAtLine(char const * qname, unsigned int const qnamelen, 
 	*(opc++) = '@';
 	
 	/* paired? add /1 or /2 before first space or at end of line */
-	if ( flags & BAM_FPAIRED )
+	if ( flags & BAMBAMC_FPAIRED )
 	{
 		while ( qname != qnamee && !spaceTable[(int)((uint8_t)(*qname))] )
 			*(opc++) = *(qname++);
 
 		*(opc++) = '/';
-		if ( flags & BAM_FREAD1 )
+		if ( flags & BAMBAMC_FREAD1 )
 			*(opc++) = '1';
 		else
 			*(opc++) = '2';
@@ -91,6 +99,74 @@ static char * BamBam_PutAtLine(char const * qname, unsigned int const qnamelen, 
 	
 	return opc;
 }
+static char * BamBam_PutPlusLine(char * opc, char const term)
+{
+	*opc++ = '+';
+	*opc++ = term;
+	return opc;
+}
+static char * BamBam_PutAlignmentFastQ(BamBam_BamSingleAlignment const * alignment, char * opc, char const term)
+{
+	char const * qname = BamBam_BamSingleAlignment_GetReadName(alignment);
+	uint32_t const flags = BamBam_BamSingleAlignment_GetFlags(alignment);
+	int32_t const seqlen = BamBam_BamSingleAlignment_GetLSeq(alignment);
+
+	/* @ line */
+	opc = BamBam_PutAtLine(qname,strlen(qname),flags,opc,term);
+	/* seq line */
+	memcpy(opc,alignment->query,seqlen); opc += seqlen; *(opc++) = term;
+	/* + line */
+	opc = BamBam_PutPlusLine(opc,term);
+	/* quality */
+	memcpy(opc,alignment->qual,seqlen); opc += seqlen; *(opc++) = term;
+
+	return opc;
+}
+static uint64_t BamBam_GetFastQAlignmentLength(BamBam_BamSingleAlignment const * alignment)
+{
+	int32_t const seqlen = BamBam_BamSingleAlignment_GetLSeq(alignment);
+	uint32_t const flags = BamBam_BamSingleAlignment_GetFlags(alignment);
+	char const * qname = BamBam_BamSingleAlignment_GetReadName(alignment);
+	unsigned int const qnamelen = strlen(qname);
+	return BamBam_GetFastqEntryLength(qnamelen, seqlen, flags);
+}
+int BamBam_PutAlignmentFastQBuffer(
+	BamBam_BamSingleAlignment * alignment, 
+	char ** buffer, 
+	unsigned int * bufferlen, 
+	char const term
+)
+{
+	unsigned int const neededlength = BamBam_GetFastQAlignmentLength(alignment);
+	char * endptr = 0;
+
+	if ( neededlength > *bufferlen )
+	{
+		free(*buffer);
+		*buffer = 0;
+		*bufferlen = 0;
+		
+		*buffer = (char *)malloc(neededlength);
+		
+		if ( ! *buffer )
+			return -1;
+		
+		*bufferlen = neededlength;
+	}
+	
+	if ( BamBam_BamSingleAlignment_DecodeQuery(alignment) < 0 )
+		return -1;
+	if ( BamBam_BamSingleAlignment_DecodeQual(alignment) < 0 )
+		return -1;
+	
+	endptr = BamBam_PutAlignmentFastQ(alignment,*buffer,term);
+	
+	return endptr - *buffer;
+}
+
+/*
+ * samtools/libbam dependent code
+ */
 static char * BamBam_PutQuality(uint8_t const * qual, unsigned int const seqlen, uint32_t const flags, char * opc, char const term)
 {
 	if ( seqlen )
@@ -103,7 +179,7 @@ static char * BamBam_PutQuality(uint8_t const * qual, unsigned int const seqlen,
 		}
 		else
 		{
-			if ( flags & BAM_FREVERSE )
+			if ( flags & BAMBAMC_FREVERSE )
 			{
 				uint8_t const * qualp = qual + seqlen;
 				
@@ -121,12 +197,6 @@ static char * BamBam_PutQuality(uint8_t const * qual, unsigned int const seqlen,
 	}
 	*(opc++) = term;
 	
-	return opc;
-}
-static char * BamBam_PutPlusLine(char * opc, char const term)
-{
-	*opc++ = '+';
-	*opc++ = term;
 	return opc;
 }
 /**
@@ -166,7 +236,7 @@ static char * BamBam_PutQuery(uint8_t const * seq, unsigned int const seqlen, ui
 	};
 
 	/* reverse complement? */
-	if ( flags & BAM_FREVERSE )
+	if ( flags & BAMBAMC_FREVERSE )
 	{
 		unsigned int i = seqlen;
 		while ( i-- )

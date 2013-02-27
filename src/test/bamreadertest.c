@@ -20,7 +20,7 @@
 #include <bambamc/BamBam_FormatAlignment.h>
 #include <assert.h>
 
-int main()
+int runCollationTest()
 {
 	BamBam_BamCollator * col = 0;
 	int cnt = 0;
@@ -39,12 +39,6 @@ int main()
 		return EXIT_FAILURE;
 	}
 	
-	#if 0	
-	fprintf(stderr,"Filtered:\n%s",col->filteredbamheadertext);
-	fprintf(stderr,"Head:\n%s",col->bamheadertext);
-	fprintf(stderr,"Number of sequences:%d\n",col->bamheader->n_targets);
-	#endif
-
 	/* get pairs */
 	while ( (cnt = BamBam_BamCollator_Get(col,&entryA,&entryB)) )
 	{
@@ -73,4 +67,55 @@ int main()
 	BamBam_BamCollator_Delete(col);
 	
 	return 0;
+}
+
+#include <bambamc/BamBam_BamFileDecoder.h>
+
+int main()
+{
+	char const * inputfilename = "/popper/scratch01/assembly/gt1/bamtofastqtest/name.bam";
+	BamBam_BamFileDecoder * decoder = 0;
+	BamBam_BamSingleAlignment * algn = 0;
+	samfile_t * bamfile = 0;
+	bam_header_t * bamheader = 0;
+	char * buffer = 0;
+	unsigned int bufferlen = 0;
+	                
+	bamfile = samopen(inputfilename,"rb",0);
+	
+	if ( ! bamfile )
+	{
+		return EXIT_FAILURE;
+	}
+	
+	bamheader = bamfile->header;
+
+	if ( ! bamheader )
+	{
+		return EXIT_FAILURE;
+	}
+	
+	decoder = BamBam_BamFileDecoder_New(inputfilename);
+
+	if ( ! decoder )
+	{
+		samclose(bamfile);
+		return EXIT_FAILURE;
+	}
+
+	while ( (algn =  BamBam_BamFileDecoder_DecodeAlignment(decoder)) )
+	{
+	
+		int const ok = BamBam_PutAlignmentFastQBuffer(algn, &buffer, &bufferlen, '\n');
+
+		if ( ok < 0 )
+			break;
+		
+		fwrite(buffer,ok,1,stdout);
+	}
+	
+	BamBam_BamFileDecoder_Delete(decoder);
+	samclose(bamfile);
+	
+	return EXIT_SUCCESS;
 }

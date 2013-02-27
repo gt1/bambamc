@@ -21,6 +21,7 @@
 #define BAMBAM_FORMATALIGNMENT_H
 
 #include <bambamc/BamBam_Unused.h>
+#include <bambamc/BamBam_BamSingleAlignment.h>
 #include <stdint.h>
 
 #include <bambamc/BamBam_Config.h>
@@ -33,4 +34,5 @@
 #endif
 
 extern int BamBam_PutAlignmentBuffer(bam1_t const * alignment, char ** buffer, unsigned int * bufferlen, char const term) BAMBAM_WARN_IF_UNUSEDRESULT;
+extern int BamBam_PutAlignmentFastQBuffer(BamBam_BamSingleAlignment * alignment,  char ** buffer,  unsigned int * bufferlen,  char const term);
 #endif

@@ -27,6 +27,7 @@
 #include <bambamc/BamBam_MergeHeapEntry.h>
 #include <bambamc/BamBam_BamHeader.h>
 #include <bambamc/BamBam_BamHeaderInfo.h>
+#include <bambamc/BamBam_BamFileDecoder.h>
 
 #include <bambamc/BamBam_Config.h>
 

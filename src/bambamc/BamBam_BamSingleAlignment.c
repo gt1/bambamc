@@ -18,6 +18,7 @@
 **/
 #include <bambamc/BamBam_BamSingleAlignment.h>
 #include <bambamc/BamBam_CharBuffer.h>
+#include <bambamc/BamBam_BamFlagBase.h>
 #include <assert.h>
 
 static uint32_t getNumLength(uint32_t num, uint32_t const base)
@@ -520,8 +521,9 @@ uint8_t const * BamBam_BamSingleAlignment_GetEncodedAux(BamBam_BamSingleAlignmen
 	return BamBam_BamSingleAlignment_GetEncodedQual(data) + (BamBam_BamSingleAlignment_GetLSeq(data));
 }
 
-int BamBam_BamSingleAlignment_DecodeQuery(BamBam_BamSingleAlignment * algn, int const rc)
+int BamBam_BamSingleAlignment_DecodeQueryRc(BamBam_BamSingleAlignment * algn, int const rc)
 {
+	/* length of query */
 	int32_t lseq = BamBam_BamSingleAlignment_GetLSeq(algn);
 	int32_t i;
 	static char const * mapping  = "=ACMGRSVTWYHKDBN";
@@ -584,7 +586,13 @@ int BamBam_BamSingleAlignment_DecodeQuery(BamBam_BamSingleAlignment * algn, int 
 	return lseq;
 }
 
-int BamBam_BamSingleAlignment_DecodeQual(BamBam_BamSingleAlignment * algn, int const rc)
+int BamBam_BamSingleAlignment_DecodeQuery(BamBam_BamSingleAlignment * algn)
+{
+	int const rc = (BamBam_BamSingleAlignment_GetFlags(algn) & BAMBAMC_FREVERSE) != 0;
+	return BamBam_BamSingleAlignment_DecodeQueryRc(algn,rc);
+}
+
+int BamBam_BamSingleAlignment_DecodeQualRc(BamBam_BamSingleAlignment * algn, int const rc)
 {
 	int32_t lseq = BamBam_BamSingleAlignment_GetLSeq(algn);
 	int32_t i;
@@ -620,7 +628,13 @@ int BamBam_BamSingleAlignment_DecodeQual(BamBam_BamSingleAlignment * algn, int c
 	return lseq;
 }
 
-int BamBam_BamSingleAlignment_DecodeCigar(BamBam_BamSingleAlignment * algn, int const rc)
+int BamBam_BamSingleAlignment_DecodeQual(BamBam_BamSingleAlignment * algn)
+{
+	int const rc = (BamBam_BamSingleAlignment_GetFlags(algn) & BAMBAMC_FREVERSE) != 0;
+	return BamBam_BamSingleAlignment_DecodeQualRc(algn,rc);
+}
+
+int BamBam_BamSingleAlignment_DecodeCigarRc(BamBam_BamSingleAlignment * algn, int const rc)
 {
 	uint8_t const * ecigar = BamBam_BamSingleAlignment_GetEncodedCigar(algn);
 	uint32_t const ncigar = BamBam_BamSingleAlignment_GetNC(algn);
@@ -701,30 +715,46 @@ int BamBam_BamSingleAlignment_DecodeCigar(BamBam_BamSingleAlignment * algn, int 
 	return cigstrlen;
 }
 
-int32_t BamBam_BamSingleAlignment_DecodeQueryQualCigar(
+int BamBam_BamSingleAlignment_DecodeCigar(BamBam_BamSingleAlignment * algn)
+{
+	int const rc = (BamBam_BamSingleAlignment_GetFlags(algn) & BAMBAMC_FREVERSE) != 0;
+	return BamBam_BamSingleAlignment_DecodeCigarRc(algn,rc);
+}
+
+int32_t BamBam_BamSingleAlignment_DecodeQueryQualCigarRc(
 	BamBam_BamSingleAlignment * algn, int rc, int32_t * querylen, int32_t * cigarlen)
 {
 	int32_t r = 0;
 	
 	if ( r >= 0 )
 	{
-		r = BamBam_BamSingleAlignment_DecodeQuery(algn,rc);
+		r = BamBam_BamSingleAlignment_DecodeQueryRc(algn,rc);
 		*querylen = r;
 	}
 	if ( r >= 0 )
 	{
-		r = BamBam_BamSingleAlignment_DecodeQual(algn,rc);
+		r = BamBam_BamSingleAlignment_DecodeQualRc(algn,rc);
 		if ( r != *querylen )
 			r = -1;
 	}
 	if ( r >= 0 )
 	{
-		r = BamBam_BamSingleAlignment_DecodeCigar(algn,rc);
+		r = BamBam_BamSingleAlignment_DecodeCigarRc(algn,rc);
 		*cigarlen = r;
 	}
 	
 	return r;
 }
+
+
+int32_t BamBam_BamSingleAlignment_DecodeQueryQualCigar(
+	BamBam_BamSingleAlignment * algn, int32_t * querylen, int32_t * cigarlen
+)
+{
+	int const rc = (BamBam_BamSingleAlignment_GetFlags(algn) & BAMBAMC_FREVERSE) != 0;
+	return BamBam_BamSingleAlignment_DecodeQueryQualCigarRc(algn,rc,querylen,cigarlen);
+}
+
 
 int BamBam_BamSingleAlignment_LoadAlignment(BamBam_BamSingleAlignment * data, BamBam_GzipReader * reader)
 {
@@ -738,8 +768,6 @@ int BamBam_BamSingleAlignment_LoadAlignment(BamBam_BamSingleAlignment * data, Ba
 	
 	if ( BamBam_GzipReader_GetInt32(reader,&reclen) < 0 )
 		return -1;
-		
-	/* fprintf(stderr,"Block len %d\n", reclen); */
 
 	if ( (int32_t)data->dataav < reclen )
 	{
@@ -810,6 +838,37 @@ BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_New()
 	
 	if ( ! data->auxbuffer )
 		return BamBam_BamSingleAlignment_Delete(data);
+			
+	return data;
+}
+
+BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_NewClone(uint8_t const * block, uint32_t const blocksize)
+{
+	BamBam_BamSingleAlignment * data = 0;
+	
+	data = (BamBam_BamSingleAlignment *)malloc(sizeof(BamBam_BamSingleAlignment));
+	
+	if ( ! data )
+		return BamBam_BamSingleAlignment_Delete(data);
+		
+	memset(data,0,sizeof(BamBam_BamSingleAlignment));
+	
+	data->auxbuffer = BamBam_CharBuffer_New();
+	
+	if ( ! data->auxbuffer )
+		return BamBam_BamSingleAlignment_Delete(data);
+		
+	if ( blocksize )
+	{
+		data->data = (uint8_t *)malloc(blocksize);
+		
+		if ( ! data->data )
+			return BamBam_BamSingleAlignment_Delete(data);
+			
+		memcpy(data->data,block,blocksize);
+		data->dataav = blocksize;
+		data->dataused = blocksize;
+	}
 			
 	return data;
 }

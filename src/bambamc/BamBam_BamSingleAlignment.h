@@ -44,6 +44,7 @@ BamBam_BamSingleAlignment;
 
 extern BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_Delete(BamBam_BamSingleAlignment * data);
 extern BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_New();
+extern BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_NewClone(uint8_t const * block, uint32_t const blocksize);
 extern BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_Clone(BamBam_BamSingleAlignment const * o);
 extern int BamBam_BamSingleAlignment_LoadAlignment(BamBam_BamSingleAlignment * data, BamBam_GzipReader * reader);
 
@@ -65,11 +66,16 @@ extern uint8_t const * BamBam_BamSingleAlignment_GetEncodedCigar(BamBam_BamSingl
 extern uint8_t const * BamBam_BamSingleAlignment_GetEncodedQuery(BamBam_BamSingleAlignment const * data);
 extern uint8_t const * BamBam_BamSingleAlignment_GetEncodedQual(BamBam_BamSingleAlignment const * data);
 extern uint8_t const * BamBam_BamSingleAlignment_GetEncodedAux(BamBam_BamSingleAlignment const * data);
-extern int BamBam_BamSingleAlignment_DecodeQuery(BamBam_BamSingleAlignment * algn, int const rc);
-extern int BamBam_BamSingleAlignment_DecodeQual(BamBam_BamSingleAlignment * algn, int const rc);
-extern int BamBam_BamSingleAlignment_DecodeCigar(BamBam_BamSingleAlignment * algn, int const rc);
-extern int32_t BamBam_BamSingleAlignment_DecodeQueryQualCigar(
+extern int BamBam_BamSingleAlignment_DecodeQueryRc(BamBam_BamSingleAlignment * algn, int const rc);
+extern int BamBam_BamSingleAlignment_DecodeQualRc(BamBam_BamSingleAlignment * algn, int const rc);
+extern int BamBam_BamSingleAlignment_DecodeCigarRc(BamBam_BamSingleAlignment * algn, int const rc);
+extern int BamBam_BamSingleAlignment_DecodeQuery(BamBam_BamSingleAlignment * algn);
+extern int BamBam_BamSingleAlignment_DecodeQual(BamBam_BamSingleAlignment * algn);
+extern int BamBam_BamSingleAlignment_DecodeCigar(BamBam_BamSingleAlignment * algn);
+extern int32_t BamBam_BamSingleAlignment_DecodeQueryQualCigarRc(
 	BamBam_BamSingleAlignment * algn, int32_t rc, int32_t * querylen, int32_t * cigarlen);
+extern int32_t BamBam_BamSingleAlignment_DecodeQueryQualCigar(
+	BamBam_BamSingleAlignment * algn, int32_t * querylen, int32_t * cigarlen);
 extern int BamBam_BamSingleAlignment_DecodeAuxSingle(BamBam_BamSingleAlignment * algn,
 	uint8_t const * p, int reset);
 extern char const * BamBam_BamSingleAlignment_DecodeAux(BamBam_BamSingleAlignment * algn);
