@@ -21,16 +21,16 @@
 
 enum bam_flags
 {
-	BAMBAM_FPAIRED = (1u << 0),
-	BAMBAM_FPROPER = (1u << 1),
-	BAMBAM_FUNMAP = (1u << 2),
-	BAMBAM_FMUNMAP = (1u << 3),
-	BAMBAM_FREVERSE = (1u << 4),
-	BAMBAM_FMREVERSE = (1u << 5),
-	BAMBAM_FREAD1 = (1u << 6),
-	BAMBAM_FREAD2 = (1u << 7),
-	BAMBAM_FSECONDARY = (1u << 8),
-	BAMBAM_FQCFAIL = (1u << 9),
-	BAMBAM_FDUP = (1u << 10)
+	BAMBAMC_FPAIRED = (1u << 0),
+	BAMBAMC_FPROPER = (1u << 1),
+	BAMBAMC_FUNMAP = (1u << 2),
+	BAMBAMC_FMUNMAP = (1u << 3),
+	BAMBAMC_FREVERSE = (1u << 4),
+	BAMBAMC_FMREVERSE = (1u << 5),
+	BAMBAMC_FREAD1 = (1u << 6),
+	BAMBAMC_FREAD2 = (1u << 7),
+	BAMBAMC_FSECONDARY = (1u << 8),
+	BAMBAMC_FQCFAIL = (1u << 9),
+	BAMBAMC_FDUP = (1u << 10)
 };
 #endif
