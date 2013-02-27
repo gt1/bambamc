@@ -51,6 +51,10 @@ int main()
 	int val = 61;
 	r = BamBam_CharBuffer_PutAuxNumber(wr->aput,"AS",'i',&val);
 	assert ( ! r );
+	int val2 = 5;
+	r = BamBam_CharBuffer_PutAuxNumber(wr->aput,"NM",'i',&val2);
+	assert ( ! r );
+
 	bam_write1(wr->outfile,wr->aput->alignment);
 	
 	BamBam_BamWriter_Delete(wr);

@@ -755,6 +755,17 @@ int32_t BamBam_BamSingleAlignment_DecodeQueryQualCigar(
 	return BamBam_BamSingleAlignment_DecodeQueryQualCigarRc(algn,rc,querylen,cigarlen);
 }
 
+int BamBam_BamSingleAlignment_StoreAlignment(BamBam_BamSingleAlignment const * data, BamBam_GzipWriter * writer)
+{
+	/* put length of entry */
+	if ( BamBam_GzipWriter_PutInt32(writer,data->dataused) < 0 )
+		return -1;
+	/* put entry */
+	if ( BamBam_GzipWriter_Write(writer,(char const *)(data->data),data->dataused) != (int64_t)(data->dataused) )
+		return -1;
+		
+	return 0;
+}
 
 int BamBam_BamSingleAlignment_LoadAlignment(BamBam_BamSingleAlignment * data, BamBam_GzipReader * reader)
 {

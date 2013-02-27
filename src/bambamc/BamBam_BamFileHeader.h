@@ -26,16 +26,27 @@
 
 typedef struct _BamBam_BamFileHeader
 {
+	// length of orignal text
 	int32_t l_text;
+	// original text
 	char * text;
+	// number of chromosomes/references
 	int32_t n_ref;
+	// linked list of chromosomes
 	BamBam_List * chromosomes;
+	// chromosomes in numerical id order
 	BamBam_Chromosome ** chromosomevec;
+	// chromosomes in name sorted order
 	BamBam_Chromosome ** sortedchromosomevec;
+	// single header lines
 	char ** headerlines;
+	// HD header line
 	char const * hdline;
+	// sort order (coordinate or queryname)
 	char * sortorder;
+	// bam file version
 	char * version;
+	// processed header text
 	char * headertext;
 } BamBam_BamFileHeader;
 

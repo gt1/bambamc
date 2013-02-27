@@ -39,7 +39,7 @@ extern int BamBam_BamCollationVector_Sort(
 	BamBam_BamCollationVector * vector,
 	BamBam_BamCollationOutputVector * outputvector,
 	BamBam_BamCollationTempFileGenerator * gen,
-	bam_header_t * bamheader
+	char const * bamheadertext
 ) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern void BamBam_BamCollationVector_Delete(BamBam_BamCollationVector * vector);
 #endif

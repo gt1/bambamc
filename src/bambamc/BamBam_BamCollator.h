@@ -28,6 +28,7 @@
 #include <bambamc/BamBam_BamHeader.h>
 #include <bambamc/BamBam_BamHeaderInfo.h>
 #include <bambamc/BamBam_BamFileDecoder.h>
+#include <bambamc/BamBam_GzipFileDecoder.h>
 
 #include <bambamc/BamBam_Config.h>
 
@@ -48,8 +49,13 @@ typedef struct _BamBam_BamCollator
 	BamBam_BamCollationVector * vector;
 	BamBam_BamCollationTempFileGenerator * gen;
 	BamBam_BamCollationOutputVector * outputvector;
+
+	#if defined(BAMBAMC_BAMONLY)
+	BamBam_BamFileDecoder * decoder;
+	#else
 	samfile_t * bamfile;
-	bam_header_t * bamheader;
+	#endif
+	
 	/* header text */
 	char * bamheadertext;
 	char * filteredbamheadertext;
@@ -58,10 +64,19 @@ typedef struct _BamBam_BamCollator
 	char * so;
 	BamBam_BamHeaderInfo * parsedheaderinfo;
 	BamBam_BamHeaderInfo * headerinfo;
+
+	#if defined(BAMBAMC_BAMONLY)
+	BamBam_BamSingleAlignment * alignment;
+	#else	
 	bam1_t * alignment;
+	#endif
 	
 	uint64_t nummergefiles;
+	#if defined(BAMBAMC_BAMONLY)
+	BamBam_GzipFileDecoder ** mergefiles;
+	#else
 	samfile_t ** mergefiles;
+	#endif
 	BamBam_MergeHeapEntry * mergeheap;
 	uint64_t mergeheapfill;
 	

@@ -941,7 +941,8 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 				return BamBam_BamFileHeader_Delete(header);	
 			}
 		}
-		
+	
+	// push terminator symbol	
 	if ( BamBam_CharBuffer_PushChar(htextbuf,0) < 0 )
 	{
 		BamBam_CharBuffer_Delete(htextbuf);
@@ -958,7 +959,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 	
 	BamBam_CharBuffer_Delete(htextbuf);
 	
-	fprintf(stderr,"%s",header->headertext);
+	// fprintf(stderr,"%s",header->headertext);
 			
 	return header;
 }

@@ -67,7 +67,11 @@ void BamBam_BamCollationHashEntry_Delete(BamBam_BamCollationHashEntry * hashentr
 	if ( hashentry )
 	{
 		if ( hashentry->entry )
+			#if defined(BAMBAMC_BAMONLY)
+			BamBam_BamSingleAlignment_Delete(hashentry->entry);
+			#else
 			bam_destroy1(hashentry->entry);
+			#endif
 		free(hashentry->qname);
 		free(hashentry);
 	}
@@ -75,14 +79,65 @@ void BamBam_BamCollationHashEntry_Delete(BamBam_BamCollationHashEntry * hashentr
 
 uint32_t BamBam_BamCollationHashEntry_GetFlags(BamBam_BamCollationHashEntry const * hashentry)
 {
+	#if defined(BAMBAMC_BAMONLY)
+	return BamBam_BamSingleAlignment_GetFlags(hashentry->entry);
+	#else
 	bam1_core_t const * core = &(hashentry->entry->core);
         /* flags */
         uint32_t const flags = core->flag;
                         
         return flags;
-                                
+        #endif                   
 }
 
+#if defined(BAMBAMC_BAMONLY)
+BamBam_BamCollationHashEntry * BamBam_BamCollationHashEntry_NewDup(BamBam_BamSingleAlignment * alignment)
+{
+	BamBam_BamSingleAlignment * entry = 0;
+	BamBam_BamCollationHashEntry * hashentry = 0;
+	char const * qname = 0;
+
+	entry = BamBam_BamSingleAlignment_Clone(alignment);
+	
+	if ( ! entry )
+		return 0;
+		
+	hashentry = (BamBam_BamCollationHashEntry *)malloc(sizeof(BamBam_BamCollationHashEntry));
+	
+	if ( ! hashentry )
+	{
+		BamBam_BamSingleAlignment_Delete(entry);
+		return 0;
+	}
+	
+	hashentry->entry = entry;
+	hashentry->qnamelen = 0;
+	hashentry->qname = 0;
+	
+	qname = BamBam_BamSingleAlignment_GetReadName(entry);
+	
+	if ( ! qname )
+	{
+		BamBam_BamSingleAlignment_Delete(entry);
+		free(hashentry);
+		return 0;
+	}
+	
+	hashentry->qname = strdup(qname);
+	
+	if ( ! hashentry->qname )
+	{
+		BamBam_BamSingleAlignment_Delete(entry);
+		free(hashentry);
+		return 0;	
+	}
+	
+	hashentry->qnamelen = strlen(hashentry->qname);	
+	hashentry->hashvalue = hashDefaultSeed((uint8_t const *)hashentry->qname,hashentry->qnamelen);
+
+	return hashentry;
+}
+#else
 BamBam_BamCollationHashEntry * BamBam_BamCollationHashEntry_NewDup(bam1_t * alignment)
 {
 	bam1_t * entry = 0;	
@@ -129,3 +184,4 @@ BamBam_BamCollationHashEntry * BamBam_BamCollationHashEntry_NewDup(bam1_t * alig
 
 	return hashentry;
 }
+#endif

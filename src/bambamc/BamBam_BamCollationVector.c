@@ -18,6 +18,7 @@
 **/
 
 #include <bambamc/BamBam_BamCollationVector.h>
+#include <bambamc/BamBam_BamSingleAlignment_ToBam1.h>
 
 BamBam_BamCollationVector * BamBam_BamCollationVector_New(unsigned int sizelog)
 {
@@ -65,7 +66,7 @@ int BamBam_BamCollationVector_Sort(
 	BamBam_BamCollationVector * vector,
 	BamBam_BamCollationOutputVector * outputvector,
 	BamBam_BamCollationTempFileGenerator * gen,
-	bam_header_t * bamheader
+	char const * bamheadertext
 )
 {
 	uint64_t i, j;
@@ -105,23 +106,116 @@ int BamBam_BamCollationVector_Sort(
 	
 	if ( vector->fill )
 	{
+		#if defined(BAMBAMC_BAMONLY)
 		char * tmpfilename = BamBam_BamCollationTempFileGenerator_GetNextTempFileName(gen);
-		bamFile bamfile;
+		BamBam_GzipWriter * gzipfile = 0;
+		int status = -1;
 		
 		if ( ! tmpfilename )
 			return -1;
 		
+		gzipfile = BamBam_GzipWriter_New(tmpfilename,1);
+		
+		if ( ! gzipfile )
+			return -1;
+
+		for ( i = 0; i < vector->fill; ++i )
+		{
+			int const r = BamBam_BamSingleAlignment_StoreAlignment(vector->entries[i]->entry,gzipfile);
+			
+			if ( r < 0 )
+			{
+				BamBam_GzipWriter_Delete(gzipfile,&status);		
+				return -1;
+			}
+		}
+			
+		BamBam_GzipWriter_Delete(gzipfile,&status);
+		
+		if ( status < 0 )
+			return -1;
+		
+		#else
+		char * tmpfilename = BamBam_BamCollationTempFileGenerator_GetNextTempFileName(gen);
+		bamFile bamfile;
+		bam_header_t * bamheader = 0;
+		#if defined(BAMBAMC_BAMONLY)
+		bam1_t * talgn = 0;
+		#endif
+		
+		if ( ! tmpfilename )
+			return -1;
+
+		#if defined(BAMBAMC_BAMONLY)
+		talgn = bam_init1();
+		if ( ! talgn )
+			return -1;
+		#endif
+		
 		bamfile = bam_open(tmpfilename, "w1");
 		
 		if ( ! bamfile )
+		{	
+			#if defined(BAMBAMC_BAMONLY)
+			bam_destroy1(talgn);
+			#endif
 			return -1;
+		}
+
+		bamheader = bam_header_init();
+		
+		if ( ! bamheader )
+		{
+			#if defined(BAMBAMC_BAMONLY)
+			bam_destroy1(talgn);
+			#endif
+			bam_close(bamfile);
+			return -1;
+		}
+		
+		bamheader->text = strdup(bamheadertext);
+		
+		if ( ! bamheader->text )
+		{
+			#if defined(BAMBAMC_BAMONLY)
+			bam_destroy1(talgn);
+			#endif
+			bam_header_destroy(bamheader);
+			bam_close(bamfile);
+			return -1;
+		}
+		
+		bamheader->l_text = strlen(bamheader->text);
+		sam_header_parse(bamheader);
 
 		bam_header_write(bamfile,bamheader);
 		
+		#if defined(BAMBAMC_BAMONLY)
+		for ( i = 0; i < vector->fill; ++i )
+		{
+			int const r = BamBam_BamSingleAlignment_ToBam1(vector->entries[i]->entry, talgn);
+			if ( r < 0 )
+			{
+				#if defined(BAMBAMC_BAMONLY)
+				bam_destroy1(talgn);
+				#endif
+				bam_header_destroy(bamheader);
+				bam_close(bamfile);		
+				return -1;
+			}
+			bam_write1(bamfile,talgn);
+		}
+		#else
 		for ( i = 0; i < vector->fill; ++i )
 			bam_write1(bamfile,vector->entries[i]->entry);
+		#endif
 
-		bam_close(bamfile);
+		#if defined(BAMBAMC_BAMONLY)
+		bam_destroy1(talgn);
+		#endif
+		bam_header_destroy(bamheader);
+		bam_close(bamfile);				
+		#endif
 	}
 	
 	return 0;

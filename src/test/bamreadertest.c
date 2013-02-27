@@ -48,8 +48,13 @@ int runCollationTest()
 			assert ( entryB );
 			// fprintf(stdout,"%s\t%s\n", entryA->qname, entryB->qname);
 
+			#if defined(BAMBAMC_BAMONLY)
+			aok = BamBam_PutAlignmentFastQBuffer(entryA->entry,&bufferA,&bufferAlen,'\n');
+			bok = BamBam_PutAlignmentFastQBuffer(entryB->entry,&bufferB,&bufferBlen,'\n');
+			#else
 			aok = BamBam_PutAlignmentBuffer(entryA->entry,&bufferA,&bufferAlen,'\n');
 			bok = BamBam_PutAlignmentBuffer(entryB->entry,&bufferB,&bufferBlen,'\n');
+			#endif
 			
 			if ( aok >= 0 && bok >= 0 )
 			{
@@ -71,9 +76,19 @@ int runCollationTest()
 
 #include <bambamc/BamBam_BamFileDecoder.h>
 
-int main()
+int main(int argc, char * argv[])
 {
-	char const * inputfilename = "/popper/scratch01/assembly/gt1/bamtofastqtest/name.bam";
+	#if 0
+	if ( 1 >= argc )
+	{
+		fprintf(stderr,"usage: %s <bamfile>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
+	
+	char const * inputfilename = argv[1];
+
+	// char const * inputfilename = "/popper/scratch01/assembly/gt1/bamtofastqtest/KB1illumChr1.bam";
+	// char const * inputfilename = "/lustre/scratch110/sanger/gt1/bambam/dup35/8940_3.bam";
 	BamBam_BamFileDecoder * decoder = 0;
 	BamBam_BamSingleAlignment * algn = 0;
 	samfile_t * bamfile = 0;
@@ -116,6 +131,9 @@ int main()
 	
 	BamBam_BamFileDecoder_Delete(decoder);
 	samclose(bamfile);
+	#endif
+	
+	runCollationTest();
 	
 	return EXIT_SUCCESS;
 }

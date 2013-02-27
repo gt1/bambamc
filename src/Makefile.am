@@ -12,7 +12,8 @@ libbambamc_la_SOURCES = \
 	bambamc/BamBam_BamCollator.c			bambamc/BamBam_Chromosome.c \
 	bambamc/BamBam_GzipReader.c bambamc/BamBam_LineParsing.c bambamc/BamBam_BamFileHeader.c \
 	bambamc/BamBam_BamAlignmentPut.c	bambamc/BamBam_BamSingleAlignment.c \
-	bambamc/BamBam_BamFileDecoder.c	bambamc/BamBam_BamSingleAlignment_ToBam1.c
+	bambamc/BamBam_BamFileDecoder.c	bambamc/BamBam_BamSingleAlignment_ToBam1.c \
+	bambamc/BamBam_GzipWriter.c	bambamc/BamBam_GzipFileDecoder.c
 libbambamc_includedir=$(includedir)/bambamc
 libbambamc_include_HEADERS= \
 	bambamc/BamBam_BamAlignmentPut.h		bambamc/BamBam_BamFlagBase.h		    bambamc/BamBam_FormatAlignment.h \
@@ -24,7 +25,8 @@ libbambamc_include_HEADERS= \
 	bambamc/BamBam_BamCollator.h			bambamc/BamBam_CharBuffer.h		    bambamc/BamBam_ListNode.h \
 	bambamc/BamBam_BamCollatorInterface.h		bambamc/BamBam_Chromosome.h		    bambamc/BamBam_MergeHeapEntry.h \
 	bambamc/BamBam_BamFileDecoder.h			bambamc/BamBam_CollatorState.h		    bambamc/BamBam_Unused.h \
-	bambamc/BamBam_BamFileHeader.h			bambamc/BamBam_FastQRead.h                  bambamc/BamBam_Config.h
+	bambamc/BamBam_BamFileHeader.h			bambamc/BamBam_FastQRead.h                  bambamc/BamBam_Config.h \
+	bambamc/BamBam_GzipWriter.h	bambamc/BamBam_GzipFileDecoder.h
 libbambamc_la_CPPFLAGS=${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
 libbambamc_la_LDFLAGS=-static -rpath $(libdir)
 

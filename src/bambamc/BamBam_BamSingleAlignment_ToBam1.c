@@ -20,6 +20,9 @@
 
 int BamBam_BamSingleAlignment_ToBam1(BamBam_BamSingleAlignment const * algn, bam1_t * bamalgn)
 {
+	uint32_t const coresize = sizeof(bamalgn->core);
+	uint32_t const varlen = algn->dataused - coresize;
+	
 	bamalgn->core.tid = BamBam_BamSingleAlignment_GetRefId(algn);
 	bamalgn->core.pos = BamBam_BamSingleAlignment_GetPos(algn);
 	bamalgn->core.bin = BamBam_BamSingleAlignment_GetBin(algn);
@@ -32,24 +35,25 @@ int BamBam_BamSingleAlignment_ToBam1(BamBam_BamSingleAlignment const * algn, bam
 	bamalgn->core.mpos = BamBam_BamSingleAlignment_GetNextPos(algn);
 	bamalgn->core.isize = BamBam_BamSingleAlignment_GetTLen(algn);
 	
-	if ( bamalgn->m_data < (int64_t)algn->dataused )
+	if ( bamalgn->m_data < (int64_t)varlen )
 	{
+		/* deallocate previous buffer */
 		free(bamalgn->data);
 		bamalgn->data = 0;
 		bamalgn->l_aux = 0;
 		bamalgn->data_len = 0;
 		bamalgn->m_data = 0;
 		
-		bamalgn->data = (uint8_t *)malloc(algn->dataav);
+		bamalgn->data = (uint8_t *)malloc(varlen);
 		
 		if ( ! bamalgn->data )
 			return -1;
 		
-		bamalgn->m_data = algn->dataav;
+		bamalgn->m_data = varlen;
 	}
 	
-	bamalgn->data_len = algn->dataused;
-	memcpy(bamalgn->data, algn->data, bamalgn->data_len);
+	bamalgn->data_len = varlen;
+	memcpy(bamalgn->data, algn->data+coresize, bamalgn->data_len);
 	bamalgn->l_aux = BamBam_BamSingleAlignment_GetAuxLength(algn);
 	
 	return 0;
