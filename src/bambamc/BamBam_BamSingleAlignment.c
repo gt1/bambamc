@@ -525,7 +525,21 @@ int BamBam_BamSingleAlignment_DecodeQuery(BamBam_BamSingleAlignment * algn, int 
 	int32_t lseq = BamBam_BamSingleAlignment_GetLSeq(algn);
 	int32_t i;
 	static char const * mapping  = "=ACMGRSVTWYHKDBN";
-	static char const * rmapping = "=TGMCRSVAWYHKDBN";
+	static char const * rmapping = "=TGKCYSBAWRDMHVN";
+	
+	/*
+	 * reverse complements for ambiguity codes:
+	 * M={A,C}   -> K={G,T}
+	 * R={A,G}   -> Y={C,T}
+	 * S={C,G}   -> S={C,G}
+	 * V={A,C,G} -> B={C,G,T}
+	 * W={A,T}   -> W={A,T}
+	 * Y={C,T}   -> R={A,G}
+	 * H={A,C,T} -> D={A,G,T}
+	 * K={G,T}   -> M={A,C}
+	 * D={A,G,T} -> H={A,C,T}
+	 * B={C,G,T} -> V={A,C,G}
+	 */
 	
 	if ( lseq > algn->queryspace )
 	{
