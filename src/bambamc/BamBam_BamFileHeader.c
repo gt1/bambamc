@@ -23,6 +23,57 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
+
+static int chromosomeCompareNames(uint8_t const * unamea, uint8_t const * unameb)
+{
+	while ( *unamea && *unameb )
+	{
+		if ( isdigit(*unamea) && isdigit(*unameb) )
+		{
+			int numa = 0, numb = 0;
+			
+			while ( *unamea && isdigit(*unamea) )
+			{
+				numa *= 10;
+				numa += (*unamea-'0');
+				unamea++;
+			}
+			while ( *unameb && isdigit(*unameb) )
+			{
+				numb *= 10;
+				numb += (*unameb-'0');
+				unameb++;
+			}
+			
+			if ( numa != numb )
+				return numa-numb;
+		}
+		else if ( *unamea != *unameb )
+		{
+			return (int)(*unamea) - (int)(*unameb);
+		}
+		else
+		{
+			unamea++, unameb++;
+		}
+	}
+	
+	return (int)(*unamea) - (int)(*unameb);
+}
+
+static int chromosomeNameComparison(void const * va, void const * vb)
+{
+	BamBam_Chromosome * a = *((BamBam_Chromosome**)(va));
+	BamBam_Chromosome * b = *((BamBam_Chromosome**)(vb));
+	char const * namea = a->name;
+	char const * nameb = b->name;
+	uint8_t const * unamea = (uint8_t const *)(namea);
+	uint8_t const * unameb = (uint8_t const *)(nameb);
+
+	return chromosomeCompareNames(unamea,unameb);
+}
+
 
 BamBam_BamFileHeader * BamBam_BamFileHeader_Delete(BamBam_BamFileHeader * object)
 {
@@ -57,6 +108,11 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_Delete(BamBam_BamFileHeader * object
 		{
 			free(object->chromosomevec);
 			object->chromosomevec = 0;
+		}
+		if ( object->sortedchromosomevec )
+		{
+			free(object->sortedchromosomevec);
+			object->sortedchromosomevec = 0;
 		}
 		if ( object->chromosomes )
 		{
@@ -192,6 +248,30 @@ static BamBam_BamFileHeader * parseHeaderText(BamBam_BamFileHeader * header)
 	}
 
 	return header;
+}
+
+static int findChromosomeByName(
+	BamBam_Chromosome const ** sc, unsigned int const numchr,
+	char const * name
+)
+{
+	int left = 0;
+	int right = numchr;
+
+	while ( right > left )
+	{
+		unsigned int const mid = left + (right-left)/2;		
+		int const r = chromosomeCompareNames((uint8_t const *)name,(uint8_t const *)(sc[mid]->name));
+		
+		if ( r == 0 )
+			return mid;
+		else if ( r < 0 )
+			right = mid;
+		else
+			left = mid+1;
+	}
+	
+	return -1;
 }
 
 BamBam_BamFileHeader * BamBam_BamFileHeader_New_SAM(FILE * reader)
@@ -359,12 +439,21 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_SAM(FILE * reader)
 			{
 				return BamBam_BamFileHeader_Delete(header);
 			}
+			
+			chr->headerline = strdup(*hc);
+			
+			if ( ! chr->headerline )
+			{
+				fprintf(stderr,"Failed to allocate memory for sequence meta data in BAM header.\n");
+				BamBam_Chromosome_Delete(chr);
+				return BamBam_BamFileHeader_Delete(header);						
+			}
 
 			node = BamBam_ListNode_New();
 		
 			if ( ! node )
 			{
-				fprintf(stderr,"Failed to allocate memoery for sequence meta data in BAM header.\n");
+				fprintf(stderr,"Failed to allocate memory for sequence meta data in BAM header.\n");
 				BamBam_Chromosome_Delete(chr);
 				return BamBam_BamFileHeader_Delete(header);			
 			}
@@ -383,18 +472,28 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_SAM(FILE * reader)
 	{
 		return BamBam_BamFileHeader_Delete(header);
 	}
+
+	header->sortedchromosomevec = (BamBam_Chromosome **)malloc(header->n_ref * sizeof(BamBam_Chromosome *));
+
+	if ( ! header->sortedchromosomevec )
+	{
+		return BamBam_BamFileHeader_Delete(header);
+	}
 	
 	i = 0;
 	for ( node = header->chromosomes->first; node; node = node->next )
 	{
 		BamBam_Chromosome * chr = (BamBam_Chromosome *)node->entry;
+		header->sortedchromosomevec[i] = chr;
 		header->chromosomevec[i++] = chr;
 	}
+
+	qsort(header->sortedchromosomevec, header->n_ref, sizeof(BamBam_Chromosome *),chromosomeNameComparison);
 
 	#if 0
 	for ( i = 0; (int)i < (int)header->n_ref; ++i )
 	{
-		BamBam_Chromosome * chr = header->chromosomevec[i];
+		BamBam_Chromosome * chr = header->sortedchromosomevec[i];
 		fprintf(stderr,"seq[%d] = %s %d\n", (int)i, chr->name, (int)chr->length);
 	}
 	#endif
@@ -500,6 +599,13 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 	{
 		return BamBam_BamFileHeader_Delete(header);
 	}
+
+	header->sortedchromosomevec = (BamBam_Chromosome **)malloc(header->n_ref * sizeof(BamBam_Chromosome *));
+
+	if ( ! header->sortedchromosomevec )
+	{
+		return BamBam_BamFileHeader_Delete(header);
+	}
 	
 	for ( i = 0; i < (unsigned int)(header->n_ref); ++i )
 	{
@@ -542,7 +648,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 
 		if ( !chr )
 		{
-			fprintf(stderr,"Failed to allocate memoery for sequence meta data in BAM header.\n");
+			fprintf(stderr,"Failed to allocate memory for sequence meta data in BAM header.\n");
 			return BamBam_BamFileHeader_Delete(header);	
 		}
 		
@@ -550,7 +656,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 		
 		if ( ! node )
 		{
-			fprintf(stderr,"Failed to allocate memoery for sequence meta data in BAM header.\n");
+			fprintf(stderr,"Failed to allocate memory for sequence meta data in BAM header.\n");
 			BamBam_Chromosome_Delete(chr);
 			return BamBam_BamFileHeader_Delete(header);			
 		}
@@ -561,14 +667,25 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 		BamBam_ListNode_PushBack(header->chromosomes,node);
 		
 		header->chromosomevec[i] = chr;	
+		header->sortedchromosomevec[i] = chr;
 	}
 
-	#if 0
+	qsort(header->sortedchromosomevec, header->n_ref, sizeof(BamBam_Chromosome *),chromosomeNameComparison);
+
+	/* check binary search */
 	for ( i = 0; i < (unsigned int)(header->n_ref); ++i )
 	{
-		fprintf(stderr,"%s\t%llu\n", header->chromosomevec[i]->name, (unsigned long long)header->chromosomevec[i]->length);
+		int r = -1;
+		
+		#if 0
+		fprintf(stderr,"%s\t%llu\n", header->sortedchromosomevec[i]->name, (unsigned long long)header->sortedchromosomevec[i]->length);
+		#endif
+
+		r = findChromosomeByName((BamBam_Chromosome const **)header->sortedchromosomevec,header->n_ref,header->sortedchromosomevec[i]->name);
+		assert ( r == (int)i );
+		
+		/* fprintf(stderr,"%d == %d\n", r, i); */
 	}
-	#endif
 
 	header = parseHeaderText(header);
 	
@@ -635,6 +752,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 		}
 	}
 
+	#if 0
 	for ( i = 0; i < (unsigned int)(header->n_ref); ++i )
 	{
 		BamBam_Chromosome const * chr = header->chromosomevec[i];
@@ -672,8 +790,13 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 			return BamBam_BamFileHeader_Delete(header);	
 		}
 	}
+	#endif
 
+	/* copy rest of the lines without SQ and HD lines */
 	for ( hc = header->headerlines; *hc; ++hc )
+	{
+		// fprintf(stderr, "Checking %s\n", *hc);
+	
 		if ( 
 			strlen(*hc) >= 4 
 			&& strncmp("@HD\t",*hc,4)
@@ -696,6 +819,128 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 				return BamBam_BamFileHeader_Delete(header);	
 			}	
 		}
+		else if ( strlen(*hc) >= 4 && strncmp("@SQ\t",*hc,4) == 0 )
+		{
+			char const * line = *hc;
+			
+			// fprintf(stderr,"Here: %s\n", line);
+			
+			while ( *line )
+			{
+				char const * field = line;
+				char const * fielde = field;
+					
+				while ( (*fielde) && (*fielde != '\t') )
+					++fielde;
+					
+				// fprintf(stderr, "field length %d\n", (fielde-field));
+
+				if ( fielde-field >= 3 && field[0] == 'S' && field[1] == 'N' && field[2] == ':' )
+				{
+					char const * name = field + 3;
+					char const * namee = fielde;
+					char * cname = (char *)malloc(namee-name+1);
+					int r = -1, q = 0;
+					BamBam_CharBuffer * buffer = htextbuf;
+					
+					if ( ! cname )
+					{
+						BamBam_CharBuffer_Delete(htextbuf);
+						return BamBam_BamFileHeader_Delete(header);
+					}
+					
+					memcpy(cname,name,namee-name);
+					cname[namee-name] = 0;
+
+					r = findChromosomeByName((BamBam_Chromosome const **)header->sortedchromosomevec,header->n_ref,cname);
+
+					if ( r < 0 )
+					{
+						fprintf(stderr,"Chromosome %s in text index is not in binary header\n",cname);
+						free(cname);
+						BamBam_CharBuffer_Delete(htextbuf);
+						return BamBam_BamFileHeader_Delete(header);					
+					}
+
+					assert ( strcmp(header->sortedchromosomevec[r]->name,cname) == 0 );
+
+					free(cname);
+					cname = 0;
+					
+					header->sortedchromosomevec[r]->headerline = strdup(*hc);
+					
+					if ( ! header->sortedchromosomevec[r]->headerline )
+					{
+						fprintf(stderr,"Unable to allocate space for header line\n");
+						BamBam_CharBuffer_Delete(htextbuf);
+						return BamBam_BamFileHeader_Delete(header);										
+					}
+
+					BamBam_CharBuffer_PushString(buffer,*hc,q);
+					if ( q < 0 )
+					{
+						BamBam_CharBuffer_Delete(htextbuf);
+						return BamBam_BamFileHeader_Delete(header);	
+					}
+					BamBam_CharBuffer_PushString(buffer,"\n",q);
+					if ( q < 0 )
+					{
+						BamBam_CharBuffer_Delete(htextbuf);
+						return BamBam_BamFileHeader_Delete(header);	
+					}	
+
+				}
+				
+				line = fielde;
+				if ( *line )
+				{
+					assert ( *line == '\t' );
+					++line;
+				}
+			}
+		}
+	}
+	
+	for ( i = 0; i < (unsigned int)(header->n_ref); ++i )
+		if ( ! header->chromosomevec[i]->headerline )
+		{
+			// fprintf(stderr,"Sequence %s is in binary header but not in text\n", header->chromosomevec[i]->name);
+			
+			BamBam_Chromosome const * chr = header->chromosomevec[i];
+			int r = 0;
+			BamBam_CharBuffer * buffer = htextbuf;
+			
+			BamBam_CharBuffer_PushString(buffer,"@SQ\tSN:",r);
+			if ( r < 0 )
+			{
+				BamBam_CharBuffer_Delete(htextbuf);
+				return BamBam_BamFileHeader_Delete(header);	
+			}
+			BamBam_CharBuffer_PushString(buffer,chr->name,r);
+			if ( r < 0 )
+			{
+				BamBam_CharBuffer_Delete(htextbuf);
+				return BamBam_BamFileHeader_Delete(header);	
+			}
+			BamBam_CharBuffer_PushString(buffer,"\tLN:",r);
+			if ( r < 0 )
+			{
+				BamBam_CharBuffer_Delete(htextbuf);
+				return BamBam_BamFileHeader_Delete(header);	
+			}
+			BamBam_CharBuffer_PushNumber(buffer,chr->length,r);
+			if ( r < 0 )
+			{
+				BamBam_CharBuffer_Delete(htextbuf);
+				return BamBam_BamFileHeader_Delete(header);	
+			}
+			BamBam_CharBuffer_PushString(buffer,"\n",r);
+			if ( r < 0 )
+			{
+				BamBam_CharBuffer_Delete(htextbuf);
+				return BamBam_BamFileHeader_Delete(header);	
+			}
+		}
 		
 	if ( BamBam_CharBuffer_PushChar(htextbuf,0) < 0 )
 	{
@@ -712,6 +957,8 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 	}
 	
 	BamBam_CharBuffer_Delete(htextbuf);
+	
+	fprintf(stderr,"%s",header->headertext);
 			
 	return header;
 }

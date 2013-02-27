@@ -31,6 +31,7 @@ typedef struct _BamBam_BamFileHeader
 	int32_t n_ref;
 	BamBam_List * chromosomes;
 	BamBam_Chromosome ** chromosomevec;
+	BamBam_Chromosome ** sortedchromosomevec;
 	char ** headerlines;
 	char const * hdline;
 	char * sortorder;

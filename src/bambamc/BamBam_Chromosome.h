@@ -27,6 +27,7 @@ typedef struct _BamBam_Chromosome
 {
 	char * name;
 	uint64_t length;
+	char * headerline;
 } BamBam_Chromosome;
 
 BamBam_Chromosome * BamBam_Chromosome_New(char const * rname, uint64_t const rlength) BAMBAM_WARN_IF_UNUSEDRESULT;

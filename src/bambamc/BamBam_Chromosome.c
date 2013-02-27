@@ -27,6 +27,8 @@ BamBam_Chromosome * BamBam_Chromosome_New(char const * rname, uint64_t const rle
 	
 	if ( ! chr )
 		return 0;
+		
+	memset(chr,0,sizeof(BamBam_Chromosome));
 
 	chr->name = strdup(rname);
 	
@@ -45,6 +47,7 @@ void BamBam_Chromosome_Delete(BamBam_Chromosome * chr)
 {
 	if ( chr )
 	{
+		free(chr->headerline);
 		free(chr->name);
 		free(chr);
 	}
