@@ -818,21 +818,34 @@ BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_Clone(BamBam_BamSingleAlig
 {
 	BamBam_BamSingleAlignment * data = 0;
 	
+	/* return null if o is null */
+	if ( ! o )
+		return 0;
+		
+	/* return null if o claims to have space for alignment data but pointer is null */
+	if ( (!(o->data)) && o->dataav )
+		return 0;
+	
 	data = (BamBam_BamSingleAlignment *)malloc(sizeof(BamBam_BamSingleAlignment));
 	
 	if ( ! data )
 		return BamBam_BamSingleAlignment_Delete(data);
 		
+	/* erase newly allocated space */
 	memset(data,0,sizeof(BamBam_BamSingleAlignment));
 	
-	data->dataav   = o->dataav;
-	data->dataused = o->dataused;
-	data->data     = (uint8_t *)malloc(data->dataav);
+	/* copy alignment data if there is any */
+	if ( o->data )
+	{
+		data->dataav   = o->dataav;
+		data->dataused = o->dataused;
+		data->data     = (uint8_t *)malloc(data->dataav);
 	
-	if ( ! data->data )
-		return BamBam_BamSingleAlignment_Delete(data);
+		if ( ! data->data )
+			return BamBam_BamSingleAlignment_Delete(data);
 		
-	memcpy(data->data,o->data,data->dataav);
+		memcpy(data->data,o->data,data->dataav);
+	}
 	
 	if ( o->query )
 	{
