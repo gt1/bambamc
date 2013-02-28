@@ -23,6 +23,7 @@
 #include <bambamc/BamBam_List.h>
 #include <bambamc/BamBam_CharBuffer.h>
 #include <bambamc/BamBam_Chromosome.h>
+#include <bambamc/BamBam_BgzfCompressor.h>
 
 typedef struct _BamBam_BamHeaderInfo
 {
@@ -37,4 +38,5 @@ extern int BamBam_BamHeaderInfo_ProduceHeaderText(BamBam_BamHeaderInfo * info) B
 extern BamBam_BamHeaderInfo * BamBam_BamHeaderInfo_Delete(BamBam_BamHeaderInfo * info);
 extern BamBam_BamHeaderInfo * BamBam_BamHeaderInfo_New(char const * version, char const * sortorder, char const * plaintext) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern int BamBam_BamHeaderInfo_AddChromosome(BamBam_BamHeaderInfo * info, char const * name, uint64_t len) BAMBAM_WARN_IF_UNUSEDRESULT;
+extern int BamBam_BamHeaderInfo_WriteBamHeader(BamBam_BamHeaderInfo * info, BamBam_BgzfCompressor * writer) BAMBAM_WARN_IF_UNUSEDRESULT;
 #endif

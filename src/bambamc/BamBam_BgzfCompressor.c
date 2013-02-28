@@ -88,8 +88,8 @@ static int BamBam_BgzfCompressor_FlushInternal(BamBam_BgzfCompressor * object, i
 			memcpy(object->outbuffer,BamBam_GzipHeaderData,sizeof(BamBam_GzipHeaderData));
 			
 			// put block size (2 byte little endian)
-			object->outbuffer[14] = (headblocksize >> 0) & 0xFFu;
-			object->outbuffer[15] = (headblocksize >> 8) & 0xFFu;
+			object->outbuffer[16] = (headblocksize >> 0) & 0xFFu;
+			object->outbuffer[17] = (headblocksize >> 8) & 0xFFu;
 
 			// compute crc
 			crc = crc32(crc, object->inbuffer, insize);
@@ -162,6 +162,10 @@ int BamBam_BgzfCompressor_Terminate(BamBam_BgzfCompressor * object)
 	r = BamBam_BgzfCompressor_FlushInternal(object,Z_DEFAULT_COMPRESSION);
 	
 	if ( r < 0 )
+		return -1;
+	
+	// flush the underlying file/stream
+	if ( fflush(object->file) != 0 )
 		return -1;
 		
 	return 0;

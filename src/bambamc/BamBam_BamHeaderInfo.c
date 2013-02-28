@@ -19,6 +19,7 @@
 
 #include <bambamc/BamBam_BamHeaderInfo.h>
 #include <string.h>
+#include <assert.h>
 
 int BamBam_BamHeaderInfo_ProduceHeaderText(BamBam_BamHeaderInfo * info)
 {
@@ -147,6 +148,37 @@ int BamBam_BamHeaderInfo_AddChromosome(BamBam_BamHeaderInfo * info, char const *
 	node->bamBamListPrintFunction = 0;
 	
 	BamBam_ListNode_PushBack(info->chrlist,node);
+
+	return 0;
+}
+
+int BamBam_BamHeaderInfo_WriteBamHeader(BamBam_BamHeaderInfo * info, BamBam_BgzfCompressor * writer)
+{
+	static char const magic[4] = { 'B', 'A', 'M', 1 };
+	int32_t numseq = BamBam_List_Size(info->chrlist);
+	BamBam_ListNode const * node = 0;
+
+	if (  BamBam_BamHeaderInfo_ProduceHeaderText(info) < 0 )
+		return -1;
+	if ( BamBam_BgzfCompressor_Write(writer,(uint8_t const *)&magic[0],4) < 0 )
+		return -1;
+	if ( BamBam_BgzfCompressor_PutInt32(writer,info->cb->bufferfill) < 0 )
+		return -1;
+	if ( BamBam_BgzfCompressor_Write(writer,info->cb->buffer,info->cb->bufferfill) < 0 )
+		return -1;
+	if ( BamBam_BgzfCompressor_PutInt32(writer,numseq) < 0 )
+		return -1;
+
+	for ( node = info->chrlist->first; node; node = node->next )
+	{
+		BamBam_Chromosome const * chr = (BamBam_Chromosome *)node->entry;
+		assert ( chr );
+		
+		if ( BamBam_BgzfCompressor_PutLenStringZ(writer,chr->name) < 0 )
+			return -1;
+		if ( BamBam_BgzfCompressor_PutInt32(writer,chr->length) < 0 )
+			return -1;
+	}		
 
 	return 0;
 }
