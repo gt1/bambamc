@@ -30,12 +30,13 @@ libbambamc_include_HEADERS= \
 	bambamc/BamBam_GzipWriter.h	bambamc/BamBam_GzipFileDecoder.h \
 	bambamc/BamBam_BgzfCompressor.h
 libbambamc_la_CPPFLAGS=${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
-libbambamc_la_LDFLAGS=-static -rpath $(libdir)
+libbambamc_la_LDFLAGS=${SAMTOOLSLDFLAGS} ${ZLIBLDFLAGS} @BAMBAMCSTATIC@ -version-info ${LIBRARY_VERSION}
+libbambamc_la_LIBADD=${SAMTOOLSLIBS} ${ZLIBLIBS}
 
 bamreadertest_SOURCES = test/bamreadertest.c
 bamreadertest_CPPFLAGS = ${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
-bamreadertest_LDADD = libbambamc.la ${SAMTOOLSLDFLAGS} ${SAMTOOLSLIBS}
+bamreadertest_LDADD = libbambamc.la ${SAMTOOLSLDFLAGS} ${SAMTOOLSLIBS} ${ZLIBLIBS}
 
 bamwritertest_SOURCES = test/bamwritertest.c
 bamwritertest_CPPFLAGS = ${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
-bamwritertest_LDADD = libbambamc.la ${SAMTOOLSLDFLAGS} ${SAMTOOLSLIBS}
+bamwritertest_LDADD = libbambamc.la ${SAMTOOLSLDFLAGS} ${SAMTOOLSLIBS} ${ZLIBLIBS}

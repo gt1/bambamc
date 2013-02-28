@@ -22,7 +22,7 @@
 #include <bambamc/BamBam_BamAlignmentPut.h>
 #include <assert.h>
 
-void testLibBamFree(FILE * file)
+int testLibBamFree(FILE * file)
 {
 	int r = -1;
 	BamBam_BamHeaderInfo * hi = 0;
@@ -75,13 +75,15 @@ void testLibBamFree(FILE * file)
 	BamBam_BamHeaderInfo_Delete(hi);
 	
 	fflush(file);
+	
+	return 0;
 }
 
-void testLibBamBased()
+#if ! defined(BAMBAMC_BAMONLY)
+int testLibBamBased()
 {
 	BamBam_BamHeaderInfo * hi = 0;
 	BamBam_BamWriter * wr = 0;
-	BamBam_AlignmentPut * bap = 0;
 	int r = -1;
 
 	hi = BamBam_BamHeaderInfo_New("1.4","unknown",0);
@@ -117,12 +119,18 @@ void testLibBamBased()
 	
 	BamBam_BamWriter_Delete(wr);
 	BamBam_BamHeaderInfo_Delete(hi);
+	
+	return 0;
 }
+#endif
 
 int main()
 {
-	//testLibBamBased();
-	testLibBamFree(stdout);
+	#if defined(BAMBAMC_BAMONLY)
+	return testLibBamFree(stdout);
+	#else
+	return testLibBamBased();
+	#endif
 
 	return 0;
 }

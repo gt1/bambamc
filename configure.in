@@ -1,4 +1,5 @@
-AC_INIT(bambamc,0.0.30,[gt1@sanger.ac.uk],[bambamc],[http://www.sanger.ac.uk])
+AC_INIT(bambamc,0.0.31,[gt1@sanger.ac.uk],[bambamc],[http://www.sanger.ac.uk])
+LIBRARY_VERSION=0:31:0
 AC_CANONICAL_SYSTEM
 AC_PROG_LIBTOOL
 
@@ -49,6 +50,7 @@ if [[ "${zlibpkg}" = "yes" ]] ; then
 		ZLIBREQ=zlib
 		ZLIBCPPFLAGS="${zlib_CFLAGS}"
 		ZLIBLIBS="${zlib_LIBS}"
+		ZLIBPKGLBIS=
 	fi
 else
 	AC_MSG_WARN([zlib pkgconfig file is not installed. Trying if -lz for LIBS is enough.])
@@ -75,13 +77,9 @@ else
 		ZLIBREQ=
 		ZLIBCPPFLAGS=
 		ZLIBLIBS="-lz"
+		ZLIBPKGLIBS="-lz"
 	fi
 fi
-
-
-#PKG_CHECK_MODULES([suds],[suds >= 0])
-#CPPFLAGS="${CPPFLAGS} ${suds_CFLAGS}"
-#LIBS="${LIBS} ${suds_LIBS}"
 
 if test "${CC}" = "gcc" ; then
 	CPPFLAGS="${CPPFLAGS} -W -Wall"
@@ -141,83 +139,88 @@ fi
 SAMTOOLSCPPFLAGS=
 SAMTOOLSLDFLAGS=
 SAMTOOLSLIBS=
-AC_ARG_WITH([samtools],
-            [AS_HELP_STRING([--with-samtools@<:@=PATH@:>@], [path to samtools directory with compiled library @<:@default=@:>@])],
-            [with_samtools=${withval}],
-            [with_samtools=])
 
-if [[ "${with_samtools}" != "no" ]] ; then
-	LIBSSAVE="${LIBS}"
-	LDFLAGSSAVE="${LDFLAGS}"
-	CPPFLAGSSAVE="${CPPFLAGS}"
+if test "${bamonly}" = "no" ; then
+	AC_ARG_WITH([samtools],
+		    [AS_HELP_STRING([--with-samtools@<:@=PATH@:>@], [path to samtools directory with compiled library @<:@default=@:>@])],
+		    [with_samtools=${withval}],
+		    [with_samtools=])
 
-	if [[ \( ! -z "${with_samtools}" \) -a \( "${with_samtools}" != "yes" \) ]] ; then
-		SAMTOOLSCPPFLAGS="-I${with_samtools}/include -I${with_samtools}"
-		SAMTOOLSLDFLAGS="-L${with_samtools}/lib -L${with_samtools}"
-	fi
+	if [[ "${with_samtools}" != "no" ]] ; then
+		LIBSSAVE="${LIBS}"
+		LDFLAGSSAVE="${LDFLAGS}"
+		CPPFLAGSSAVE="${CPPFLAGS}"
 
-	SAMTOOLSLIBS="-lbam -lz"
+		if [[ \( ! -z "${with_samtools}" \) -a \( "${with_samtools}" != "yes" \) ]] ; then
+			SAMTOOLSCPPFLAGS="-I${with_samtools}/include -I${with_samtools}"
+			SAMTOOLSLDFLAGS="-L${with_samtools}/lib -L${with_samtools}"
+		fi
 
-	CPPFLAGSSAVE="${CPPFLAGS}"
-	LDFLAGSSAVE="${LDFLAGS}"
-	CPPFLAGS="${CPPFLAGS} ${SAMTOOLSCPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${SAMTOOLSLDFLAGS}"
+		SAMTOOLSLIBS="-lbam -lz"
 
-	AC_CHECK_HEADER(sam.h, [sam_h=yes], [sam_h=no])
-	AC_CHECK_HEADER(samtools/sam.h, [samtools_sam_h=yes], [samtools_sam_h=no])
-
-	CPPFLAGS="${CPPFLAGSSAVE}"
-	LDFLAGS="${LDFLAGSSAVE}"
-
-	if test "${sam_h}" = "yes" -o "${samtools_sam_h}" = "yes" ; then
 		CPPFLAGSSAVE="${CPPFLAGS}"
 		LDFLAGSSAVE="${LDFLAGS}"
-		LIBSSAVE="${LIBS}"
 		CPPFLAGS="${CPPFLAGS} ${SAMTOOLSCPPFLAGS}"
 		LDFLAGS="${LDFLAGS} ${SAMTOOLSLDFLAGS}"
-		LIBS="${LIBS} ${SAMTOOLSLIBS}"
 
-		if test "${sam_h}" = "yes" ; then
-			SAMHEADER="sam.h"
-			SAMHEADERDEFINE="#define HAVE_SAM_H"
-			CPPFLAGS="${CPPFLAGS} -DHAVE_SAM_H"
-		fi
-		if test "${samtools_sam_h}" = "yes" ; then
-			SAMHEADER="samtools/sam.h"
-			SAMHEADERDEFINE="#define HAVE_SAMTOOLS_SAM_H"
-			CPPFLAGS="${CPPFLAGS} -DHAVE_SAMTOOLS_SAM_H"
-		fi
+		AC_CHECK_HEADER(sam.h, [sam_h=yes], [sam_h=no])
+		AC_CHECK_HEADER(samtools/sam.h, [samtools_sam_h=yes], [samtools_sam_h=no])
 
-		AC_MSG_CHECKING([whether we can compile a program using ${SAMHEADER}])
-			AC_LINK_IFELSE([AC_LANG_SOURCE([
-#if defined(HAVE_SAM_H)
-#include <sam.h>
-#endif
-#if defined(HAVE_SAMTOOLS_SAM_H)
-#include <samtools/sam.h>
-#endif
-
-				int main() {
-					sam_open("reads.sam");
-					return 0;
-			}])],
-			have_sam=yes,
-			have_sam=no
-		)
-
-		AC_MSG_RESULT($have_sam)
 		CPPFLAGS="${CPPFLAGSSAVE}"
 		LDFLAGS="${LDFLAGSSAVE}"
-		LIBS="${LIBSSAVE}"
 
-		if test "${have_sam}" = "no" ; then
-			AC_MSG_ERROR(["Compiling test program failed, aborting.])
+		if test "${sam_h}" = "yes" -o "${samtools_sam_h}" = "yes" ; then
+			CPPFLAGSSAVE="${CPPFLAGS}"
+			LDFLAGSSAVE="${LDFLAGS}"
+			LIBSSAVE="${LIBS}"
+			CPPFLAGS="${CPPFLAGS} ${SAMTOOLSCPPFLAGS}"
+			LDFLAGS="${LDFLAGS} ${SAMTOOLSLDFLAGS}"
+			LIBS="${LIBS} ${SAMTOOLSLIBS}"
+
+			if test "${sam_h}" = "yes" ; then
+				SAMHEADER="sam.h"
+				SAMHEADERDEFINE="#define HAVE_SAM_H"
+				CPPFLAGS="${CPPFLAGS} -DHAVE_SAM_H"
+			fi
+			if test "${samtools_sam_h}" = "yes" ; then
+				SAMHEADER="samtools/sam.h"
+				SAMHEADERDEFINE="#define HAVE_SAMTOOLS_SAM_H"
+				CPPFLAGS="${CPPFLAGS} -DHAVE_SAMTOOLS_SAM_H"
+			fi
+
+			AC_MSG_CHECKING([whether we can compile a program using ${SAMHEADER}])
+				AC_LINK_IFELSE([AC_LANG_SOURCE([
+	#if defined(HAVE_SAM_H)
+	#include <sam.h>
+	#endif
+	#if defined(HAVE_SAMTOOLS_SAM_H)
+	#include <samtools/sam.h>
+	#endif
+
+					int main() {
+						sam_open("reads.sam");
+						return 0;
+				}])],
+				have_sam=yes,
+				have_sam=no
+			)
+
+			AC_MSG_RESULT($have_sam)
+			CPPFLAGS="${CPPFLAGSSAVE}"
+			LDFLAGS="${LDFLAGSSAVE}"
+			LIBS="${LIBSSAVE}"
+
+			if test "${have_sam}" = "no" ; then
+				AC_MSG_ERROR(["Compiling test program failed, aborting.])
+			fi
+
+			BAMBAMCSTATIC="-static -rpath \$(libdir)"
+		else
+			AC_MSG_ERROR([Header sam.h not found. Please set --with-samtools accordingly])
 		fi
 	else
-		AC_MSG_ERROR([Header sam.h not found. Please set --with-samtools accordingly])
+		AC_MSG_ERROR([Compiled samtools/lib required. Please set --with-samtools accordingly])
 	fi
-else
-	AC_MSG_ERROR([Compiled samtools/lib required. Please set --with-samtools accordingly])
 fi
 
 PACKAGE_NAME=${PACKAGE}
@@ -230,7 +233,10 @@ AC_SUBST([SAMTOOLSLDFLAGS])
 AC_SUBST([SAMTOOLSLIBS])
 AC_SUBST([ZLIBCPPFLAGS])
 AC_SUBST([ZLIBLIBS])
+AC_SUBST([ZLIBPKGLIBS])
 AC_SUBST([ZLIBREQ])
 AC_SUBST([SAMHEADERDEFINE])
 AC_SUBST([BAMONLYDEFINE])
+AC_SUBST([BAMBAMCSTATIC])
+AC_SUBST([LIBRARY_VERSION])
 AC_OUTPUT(Makefile src/Makefile ubuntu.sh bambamc.pc src/bambamc/BamBam_Config.h)
