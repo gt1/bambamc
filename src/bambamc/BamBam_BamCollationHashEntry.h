@@ -27,11 +27,13 @@
 
 #include <bambamc/BamBam_Config.h>
 
+#if !defined(BAMBAMC_BAMONLY)
 #if defined(HAVE_SAM_H)
 #include <sam.h>
 #endif
 #if defined(HAVE_SAMTOOLS_SAM_H)
 #include <samtools/sam.h>
+#endif
 #endif
 
 typedef struct _BamBam_BamCollationHashEntry

@@ -18,12 +18,13 @@
 **/
 
 #include <bambamc/BamBam_BamCollationHashEntry.h>
+#include <bambamc/BamBam_BamFlagBase.h>
 
 int BamBam_BamHashEntry_Compare(BamBam_BamCollationHashEntry const * A, BamBam_BamCollationHashEntry const * B)
 {
 	int cmpres = strcmp(A->qname,B->qname);
-	int Amate1 = (BamBam_BamCollationHashEntry_GetFlags(A) & BAM_FREAD1) != 0;
-	int Bmate1 = (BamBam_BamCollationHashEntry_GetFlags(B) & BAM_FREAD1) != 0;
+	int Amate1 = (BamBam_BamCollationHashEntry_GetFlags(A) & BAMBAMC_FREAD1) != 0;
+	int Bmate1 = (BamBam_BamCollationHashEntry_GetFlags(B) & BAMBAMC_FREAD1) != 0;
 	
 	if ( cmpres != 0 )
 		return cmpres;
@@ -39,8 +40,8 @@ int BamBam_BamHashEntry_Compare(BamBam_BamCollationHashEntry const * A, BamBam_B
 int BamBam_BamHashEntry_CompareVerbose(BamBam_BamCollationHashEntry const * A, BamBam_BamCollationHashEntry const * B)
 {
 	int cmpres = strcmp(A->qname,B->qname);
-	int Amate1 = (BamBam_BamCollationHashEntry_GetFlags(A) & BAM_FREAD1) != 0;
-	int Bmate1 = (BamBam_BamCollationHashEntry_GetFlags(B) & BAM_FREAD1) != 0;
+	int Amate1 = (BamBam_BamCollationHashEntry_GetFlags(A) & BAMBAMC_FREAD1) != 0;
+	int Bmate1 = (BamBam_BamCollationHashEntry_GetFlags(B) & BAMBAMC_FREAD1) != 0;
 	
 	fprintf(stderr,"Comparing %s and %s result %d\n", A->qname, B->qname, cmpres);
 	

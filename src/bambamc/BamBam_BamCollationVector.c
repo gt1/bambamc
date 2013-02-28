@@ -108,6 +108,8 @@ int BamBam_BamCollationVector_Sort(
 	{
 		#if defined(BAMBAMC_BAMONLY)
 		char * tmpfilename = BamBam_BamCollationTempFileGenerator_GetNextTempFileName(gen);
+		
+		#if 0
 		BamBam_GzipWriter * gzipfile = 0;
 		int status = -1;
 		
@@ -134,6 +136,41 @@ int BamBam_BamCollationVector_Sort(
 		
 		if ( status < 0 )
 			return -1;
+		#else
+		
+		BamBam_BgzfCompressor * gzipfile = 0;
+		int status = -1;
+
+		if ( ! tmpfilename )
+			return -1;
+		
+		gzipfile = BamBam_BgzfCompressor_New(tmpfilename,1);
+		
+		if ( ! gzipfile )
+			return -1;
+
+		for ( i = 0; i < vector->fill; ++i )
+		{
+			int const r = BamBam_BamSingleAlignment_StoreAlignmentBgzf(vector->entries[i]->entry,gzipfile);
+			
+			if ( r < 0 )
+			{
+				BamBam_BgzfCompressor_Delete(gzipfile);
+				return -1;
+			}
+		}
+		
+		status = BamBam_BgzfCompressor_Terminate(gzipfile);
+		
+		if ( status < 0 )
+		{
+			BamBam_BgzfCompressor_Delete(gzipfile);
+			return -1;	
+		}
+			
+		BamBam_BgzfCompressor_Delete(gzipfile);
+		
+		#endif
 		
 		#else
 		char * tmpfilename = BamBam_BamCollationTempFileGenerator_GetNextTempFileName(gen);

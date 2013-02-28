@@ -767,6 +767,23 @@ int BamBam_BamSingleAlignment_StoreAlignment(BamBam_BamSingleAlignment const * d
 	return 0;
 }
 
+int BamBam_BamSingleAlignment_StoreAlignmentBgzf(BamBam_BamSingleAlignment const * data, BamBam_BgzfCompressor * writer)
+{
+	uint8_t used[4] =
+	{
+		(data->dataused >> 0) & 0xFFu,
+		(data->dataused >> 8) & 0xFFu,
+		(data->dataused >> 16) & 0xFFu,
+		(data->dataused >> 24) & 0xFFu
+	};
+	if ( BamBam_BgzfCompressor_Write(writer,&used[0],4) < 0 )
+		return -1;
+	if ( BamBam_BgzfCompressor_Write(writer,data->data,data->dataused) < 0 )
+		return -1;
+	
+	return 0;
+}
+
 int BamBam_BamSingleAlignment_LoadAlignment(BamBam_BamSingleAlignment * data, BamBam_GzipReader * reader)
 {
 	int32_t reclen;

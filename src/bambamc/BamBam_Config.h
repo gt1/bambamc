@@ -16,26 +16,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
+#if ! defined(BAMBAMC_CONFIG_H)
+#define BAMBAMC_CONFIG_H
 
-#if ! defined(BAMBAM_FORMATALIGNMENT_H)
-#define BAMBAM_FORMATALIGNMENT_H
-
-#include <bambamc/BamBam_Unused.h>
-#include <bambamc/BamBam_BamSingleAlignment.h>
-#include <bambamc/BamBam_Config.h>
-#include <stdint.h>
-
-#if defined(BAMBAMC_BAMONLY)
-extern int BamBam_PutAlignmentFastQBuffer(BamBam_BamSingleAlignment * alignment,  char ** buffer,  unsigned int * bufferlen,  char const term);
-#else
-#if defined(HAVE_SAM_H)
-#include <sam.h>
-#endif
-#if defined(HAVE_SAMTOOLS_SAM_H)
-#include <samtools/sam.h>
-#endif
-
-extern int BamBam_PutAlignmentBuffer(bam1_t const * alignment, char ** buffer, unsigned int * bufferlen, char const term) BAMBAM_WARN_IF_UNUSEDRESULT;
-#endif
+#define HAVE_SAM_H
+#define BAMBAMC_BAMONLY
 
 #endif

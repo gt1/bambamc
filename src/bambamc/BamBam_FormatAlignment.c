@@ -164,6 +164,7 @@ int BamBam_PutAlignmentFastQBuffer(
 	return endptr - *buffer;
 }
 
+#if !defined(BAMBAMC_BAMONLY)
 /*
  * samtools/libbam dependent code
  */
@@ -328,3 +329,4 @@ int BamBam_PutAlignmentBuffer(bam1_t const * alignment, char ** buffer, unsigned
 	
 	return endptr - *buffer;
 }
+#endif

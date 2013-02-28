@@ -22,6 +22,7 @@
 #include <bambamc/BamBam_BamFileHeader.h>
 #include <bambamc/BamBam_CharBuffer.h>
 #include <bambamc/BamBam_GzipWriter.h>
+#include <bambamc/BamBam_BgzfCompressor.h>
 #include <string.h>
 
 typedef struct _BamBam_BamSingleAlignment
@@ -49,6 +50,7 @@ extern BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_NewClone(uint8_t co
 extern BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_Clone(BamBam_BamSingleAlignment const * o);
 extern int BamBam_BamSingleAlignment_LoadAlignment(BamBam_BamSingleAlignment * data, BamBam_GzipReader * reader);
 extern int BamBam_BamSingleAlignment_StoreAlignment(BamBam_BamSingleAlignment const * data, BamBam_GzipWriter * writer);
+extern int BamBam_BamSingleAlignment_StoreAlignmentBgzf(BamBam_BamSingleAlignment const * data, BamBam_BgzfCompressor * writer);
 
 extern int32_t BamBam_BamSingleAlignment_GetRefId(BamBam_BamSingleAlignment const * data);
 extern int32_t BamBam_BamSingleAlignment_GetPos(BamBam_BamSingleAlignment const * data);
