@@ -19,18 +19,76 @@
 
 #include <bambamc/BamBam_BamHeaderInfo.h>
 #include <bambamc/BamBam_BamWriter.h>
+#include <bambamc/BamBam_BamAlignmentPut.h>
 #include <assert.h>
 
-int main()
+void testLibBamFree(FILE * file)
 {
 	int r = -1;
 	BamBam_BamHeaderInfo * hi = 0;
-	BamBam_BamWriter * wr = 0;
+	BamBam_BgzfCompressor * bgzf = 0;
+	BamBam_AlignmentPut * bap = 0;
 	
 	hi = BamBam_BamHeaderInfo_New("1.4","unknown",0);
 	assert ( hi );
 	r = BamBam_BamHeaderInfo_AddChromosome(hi, "chr1",10000);
 	assert ( ! r );
+
+	bgzf = BamBam_BgzfCompressor_NewFP(file,1);
+	assert ( bgzf );
+	
+	r = BamBam_BamHeaderInfo_WriteBamHeader(hi,bgzf);
+	assert ( r >= 0 );
+	
+	bap = BamBam_AlignmentPut_New();
+	assert ( bap );
+
+	r = BamBam_CharBuffer_PutAlignmentC(
+		bap,
+		0,
+		0,
+		5000,
+		-1,
+		0,
+		"readname",
+		"ACGTTGCA",
+		"HHHHHHHH",
+		"8M",
+		60,
+		100);		
+	assert ( r >= 0 );
+	int val = 61;
+	r = BamBam_CharBuffer_PutAuxNumberC(bap,"AS",'i',&val);
+	assert ( ! r );
+	int val2 = 5;
+	r = BamBam_CharBuffer_PutAuxNumberC(bap,"NM",'i',&val2);
+	assert ( ! r );
+	
+	r = BamBam_BamSingleAlignment_StoreAlignmentBgzf(bap->calignment,bgzf);
+	assert ( r >= 0 );
+	
+	r = BamBam_BgzfCompressor_Terminate(bgzf);
+	assert ( r >= 0 );
+	
+	BamBam_BgzfCompressor_Delete(bgzf);
+	BamBam_AlignmentPut_Delete(bap);
+	BamBam_BamHeaderInfo_Delete(hi);
+	
+	fflush(file);
+}
+
+void testLibBamBased()
+{
+	BamBam_BamHeaderInfo * hi = 0;
+	BamBam_BamWriter * wr = 0;
+	BamBam_AlignmentPut * bap = 0;
+	int r = -1;
+
+	hi = BamBam_BamHeaderInfo_New("1.4","unknown",0);
+	assert ( hi );
+	r = BamBam_BamHeaderInfo_AddChromosome(hi, "chr1",10000);
+	assert ( ! r );
+
 	wr = BamBam_BamWriter_New(hi,"-",1);
 	assert ( wr );
 
@@ -59,6 +117,12 @@ int main()
 	
 	BamBam_BamWriter_Delete(wr);
 	BamBam_BamHeaderInfo_Delete(hi);
+}
+
+int main()
+{
+	//testLibBamBased();
+	testLibBamFree(stdout);
 
 	return 0;
 }

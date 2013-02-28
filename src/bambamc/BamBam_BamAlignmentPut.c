@@ -278,7 +278,6 @@ int BamBam_CharBuffer_PutAuxNumberC(BamBam_AlignmentPut * aput, char const * tag
 	alignment->data     = 0;
 	alignment->dataav   = 0;
 	alignment->dataused = 0;
-	BamBam_CharBuffer_Reset(buffer);
 	
 	assert ( strlen(tag) == 2 );
 
