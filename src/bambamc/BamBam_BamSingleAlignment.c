@@ -776,6 +776,7 @@ int BamBam_BamSingleAlignment_StoreAlignmentBgzf(BamBam_BamSingleAlignment const
 		(data->dataused >> 16) & 0xFFu,
 		(data->dataused >> 24) & 0xFFu
 	};
+	
 	if ( BamBam_BgzfCompressor_Write(writer,&used[0],4) < 0 )
 		return -1;
 	if ( BamBam_BgzfCompressor_Write(writer,data->data,data->dataused) < 0 )
