@@ -18,6 +18,8 @@
 **/
 
 #include <bambamc/BamBam_BamHeader.h>
+
+#if ! defined(BAMBAMC_BAMONLY)
 #include <bambamc/BamBam_BamHeaderInfo.h>
 
 BamBam_BamHeader * BamBam_BamHeader_New(BamBam_BamHeaderInfo * info)
@@ -57,3 +59,4 @@ void BamBam_BamHeader_Delete(BamBam_BamHeader * header)
 		free(header);
 	}
 }
+#endif

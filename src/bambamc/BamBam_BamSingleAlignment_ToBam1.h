@@ -20,9 +20,9 @@
 #define BAMBAM_BAMSINGLEALIGNMENT_TOBAM1_H
 
 #include <bambamc/BamBam_BamSingleAlignment.h>
-
 #include <bambamc/BamBam_Config.h>
 
+#if ! defined(BAMBAMC_BAMONLY)
 #if defined(HAVE_SAM_H)
 #include <sam.h>
 #endif
@@ -31,4 +31,5 @@
 #endif
 
 extern int BamBam_BamSingleAlignment_ToBam1(BamBam_BamSingleAlignment const * algn, bam1_t * bamalgn);
+#endif
 #endif

@@ -19,6 +19,7 @@
 
 #include <bambamc/BamBam_BamCollationVector.h>
 #include <bambamc/BamBam_BamSingleAlignment_ToBam1.h>
+#include <bambamc/BamBam_BamFlagBase.h>
 
 BamBam_BamCollationVector * BamBam_BamCollationVector_New(unsigned int sizelog)
 {
@@ -84,9 +85,9 @@ int BamBam_BamCollationVector_Sort(
 		if ( 
 			i+1 < vector->fill &&
 			strcmp(vector->entries[i]->qname,vector->entries[i+1]->qname) == 0 &&
-			(((BamBam_BamCollationHashEntry_GetFlags(vector->entries[i]) & BAM_FREAD1) && (BamBam_BamCollationHashEntry_GetFlags(vector->entries[i+1]) & BAM_FREAD2))
+			(((BamBam_BamCollationHashEntry_GetFlags(vector->entries[i]) & BAMBAMC_FREAD1) && (BamBam_BamCollationHashEntry_GetFlags(vector->entries[i+1]) & BAMBAMC_FREAD2))
 			||
-			((BamBam_BamCollationHashEntry_GetFlags(vector->entries[i]) & BAM_FREAD2) && (BamBam_BamCollationHashEntry_GetFlags(vector->entries[i+1]) & BAM_FREAD1)))
+			((BamBam_BamCollationHashEntry_GetFlags(vector->entries[i]) & BAMBAMC_FREAD2) && (BamBam_BamCollationHashEntry_GetFlags(vector->entries[i+1]) & BAMBAMC_FREAD1)))
 		)
 		{
 			/* fprintf(stderr,"Found pair %s %s\n", vector->entries[i]->qname, vector->entries[i+1]->qname); */

@@ -18,7 +18,6 @@
 **/
 
 #include <bambamc/BamBam_BamCollator.h>
-
 #include <bambamc/BamBam_CharBuffer.h>
 #include <bambamc/BamBam_LineParsing.h>
 #include <assert.h>
@@ -196,7 +195,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 				nhashentryflags = BamBam_BamCollationHashEntry_GetFlags(nhashentry);
 				
 				/* single end? */
-				if ( !(nhashentryflags & BAM_FPAIRED) )
+				if ( !(nhashentryflags & BAMBAMC_FPAIRED) )
 				{
 					BamBam_BamCollationOutputVector_PushBack(collator->outputvector,nhashentry);
 				}
@@ -222,15 +221,15 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 							! strcmp(ohashentry->qname,nhashentry->qname)
 							&& 
 							(
-								((nhashentryflags & BAM_FREAD1) && (ohashentryflags & BAM_FREAD2))
+								((nhashentryflags & BAMBAMC_FREAD1) && (ohashentryflags & BAMBAMC_FREAD2))
 								||
-								((nhashentryflags & BAM_FREAD2) && (ohashentryflags & BAM_FREAD1))
+								((nhashentryflags & BAMBAMC_FREAD2) && (ohashentryflags & BAMBAMC_FREAD1))
 							)
 						)
 						{
 							/* found pair */
 							collator->hash->entries[ nhashentry->hashvalue & collator->hash->tablemask ] = 0;
-							if ( (ohashentryflags & BAM_FREAD1) != 0 )
+							if ( (ohashentryflags & BAMBAMC_FREAD1) != 0 )
 							{
 								BamBam_BamCollationOutputVector_PushBack(collator->outputvector,ohashentry);
 								BamBam_BamCollationOutputVector_PushBack(collator->outputvector,nhashentry);
@@ -918,7 +917,7 @@ int BamBam_BamCollator_Get(BamBam_BamCollator * collator, BamBam_BamCollationHas
 	/* only one alignment left (orphan) */
 	else if ( ! peekB )
 	{
-		if ( BamBam_BamCollationHashEntry_GetFlags(peekA) & BAM_FREAD2 )
+		if ( BamBam_BamCollationHashEntry_GetFlags(peekA) & BAMBAMC_FREAD2 )
 			*entryB = peekA;
 		else
 			*entryA = peekA;
@@ -937,13 +936,13 @@ int BamBam_BamCollator_Get(BamBam_BamCollator * collator, BamBam_BamCollationHas
 			(!strcmp(peekA->qname,peekB->qname))
 			&&
 			(
-			((BamBam_BamCollationHashEntry_GetFlags(peekA) & BAM_FREAD1) &&(BamBam_BamCollationHashEntry_GetFlags(peekB) & BAM_FREAD2))
+			((BamBam_BamCollationHashEntry_GetFlags(peekA) & BAMBAMC_FREAD1) &&(BamBam_BamCollationHashEntry_GetFlags(peekB) & BAMBAMC_FREAD2))
 			||
-			((BamBam_BamCollationHashEntry_GetFlags(peekB) & BAM_FREAD1) &&(BamBam_BamCollationHashEntry_GetFlags(peekA) & BAM_FREAD2))
+			((BamBam_BamCollationHashEntry_GetFlags(peekB) & BAMBAMC_FREAD1) &&(BamBam_BamCollationHashEntry_GetFlags(peekA) & BAMBAMC_FREAD2))
 			)
 		)
 		{
-			if ( BamBam_BamCollationHashEntry_GetFlags(peekA) & BAM_FREAD1 )
+			if ( BamBam_BamCollationHashEntry_GetFlags(peekA) & BAMBAMC_FREAD1 )
 			{
 				*entryA = peekA;
 				*entryB = peekB;
@@ -959,7 +958,7 @@ int BamBam_BamCollator_Get(BamBam_BamCollator * collator, BamBam_BamCollationHas
 		/* orphan */
 		else
 		{
-			if ( BamBam_BamCollationHashEntry_GetFlags(peekA) & BAM_FREAD2 )
+			if ( BamBam_BamCollationHashEntry_GetFlags(peekA) & BAMBAMC_FREAD2 )
 				*entryB = peekA;
 			else
 				*entryA = peekA;

@@ -169,7 +169,7 @@ int BamBam_ReadPair(int const id, BamBam_FastQRead * const reada, BamBam_FastQRe
 		/* single end */
 		else if ( 
 			getret == 1 && collator->entryA && 
-			(!((BamBam_BamCollationHashEntry_GetFlags(collator->entryA)) & BAM_FPAIRED))
+			(!((BamBam_BamCollationHashEntry_GetFlags(collator->entryA)) & BAMBAMC_FPAIRED))
 		)
 		{
 			if ( aligna )

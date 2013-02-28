@@ -33,4 +33,18 @@ enum bam_flags
 	BAMBAMC_FQCFAIL = (1u << 9),
 	BAMBAMC_FDUP = (1u << 10)
 };
+
+enum bambam_cigar_operators
+{
+	BAMBAMC_CMATCH = 0,
+	BAMBAMC_CINS = 1,
+	BAMBAMC_CDEL = 2,
+	BAMBAMC_CREF_SKIP = 3,
+	BAMBAMC_CSOFT_CLIP = 4,
+	BAMBAMC_CHARD_CLIP = 5,
+	BAMBAMC_CPAD = 6,
+	BAMBAMC_CEQUAL = 7,
+	BAMBAMC_CDIFF = 8
+};
 #endif
+

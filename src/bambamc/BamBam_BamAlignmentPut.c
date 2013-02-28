@@ -17,11 +17,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 #include <bambamc/BamBam_BamAlignmentPut.h>
+#include <bambamc/BamBam_BamFlagBase.h>
 
 BamBam_AlignmentPut * BamBam_AlignmentPut_Delete(BamBam_AlignmentPut * aput)
 {
 	if ( aput )
 	{
+		#if ! defined(BAMBAMC_BAMONLY)
 		if ( aput->alignment )
 		{
 			aput->alignment->data = 0;
@@ -29,6 +31,7 @@ BamBam_AlignmentPut * BamBam_AlignmentPut_Delete(BamBam_AlignmentPut * aput)
 			aput->alignment->m_data = 0;
 			bam_destroy1(aput->alignment); aput->alignment = 0;
 		}
+		#endif
 		if ( aput->calignment )
 		{
 			BamBam_BamSingleAlignment_Delete(aput->calignment);
@@ -59,14 +62,29 @@ BamBam_AlignmentPut * BamBam_AlignmentPut_New()
 	
 	if ( ! aput->calignment )
 		return BamBam_AlignmentPut_Delete(aput);
-	
+
+	#if !defined(BAMBAMC_BAMONLY)	
 	aput->alignment = bam_init1();
 	
 	if ( ! aput->alignment )
 		return BamBam_AlignmentPut_Delete(aput);
+	#endif
 	
 	return aput;
 }
+
+/* reg2bin as defined in sam file format spec */
+static inline int reg2bin(uint32_t beg, uint32_t end)
+{
+	--end;
+	if (beg>>14 == end>>14) return ((1ul<<15)-1ul)/7ul + (beg>>14);
+	if (beg>>17 == end>>17) return ((1ul<<12)-1ul)/7ul + (beg>>17);
+	if (beg>>20 == end>>20) return ((1ul<<9)-1ul)/7ul  + (beg>>20);
+	if (beg>>23 == end>>23) return ((1ul<<6)-1ul)/7ul + (beg>>23);
+	if (beg>>26 == end>>26) return ((1ul<<3)-1ul)/7ul + (beg>>26);
+	return 0;
+}
+
 
 int BamBam_CharBuffer_PutAlignmentC(
 	BamBam_AlignmentPut * aput,
@@ -168,36 +186,36 @@ int BamBam_CharBuffer_PutAlignmentC(
 		switch ( *cigar )
 		{
 			case 'M':
-				op = BAM_CMATCH;
+				op = BAMBAMC_CMATCH;
 				endpos += num;
 				break;
 			case 'I':
-				op = BAM_CINS;
+				op = BAMBAMC_CINS;
 				break;
 			case 'D':
-				op = BAM_CDEL;
+				op = BAMBAMC_CDEL;
 				endpos += num;
 				break;
 			case 'N':
-				op = BAM_CREF_SKIP;
+				op = BAMBAMC_CREF_SKIP;
 				endpos += num;
 				break;
 			case 'S':
-				op = BAM_CSOFT_CLIP;
+				op = BAMBAMC_CSOFT_CLIP;
 				break;
 			case 'H':
-				op = BAM_CHARD_CLIP;
+				op = BAMBAMC_CHARD_CLIP;
 				break;
 			case 'P':
-				op = BAM_CPAD;
+				op = BAMBAMC_CPAD;
 				endpos += num;
 				break;
 			case '=':
-				op = BAM_CEQUAL;
+				op = BAMBAMC_CEQUAL;
 				endpos += num;
 				break;
 			case 'X':
-				op = BAM_CDIFF;
+				op = BAMBAMC_CDIFF;
 				endpos += num;
 				break;
 			default:
@@ -207,7 +225,7 @@ int BamBam_CharBuffer_PutAlignmentC(
 		
 		cigar++;
 		
-		/* fprintf(stderr,"op: %u cmatch: %u num: %llu\n", op, BAM_CMATCH, (unsigned long long)num); */
+		/* fprintf(stderr,"op: %u cmatch: %u num: %llu\n", op, BAMBAMC_CMATCH, (unsigned long long)num); */
 		
 		store = op | (num << 4);
 		
@@ -247,7 +265,7 @@ int BamBam_CharBuffer_PutAlignmentC(
 		return ret;	
 		
 	/* set bin */
-	bin = bam_reg2bin(rpos, endpos);
+	bin = reg2bin(rpos, endpos);
 	buffer->buffer[10] = (bin>>0)&0xFFu;
 	buffer->buffer[11] = (bin>>8)&0xFFu;
 
@@ -349,6 +367,7 @@ int BamBam_CharBuffer_PutAuxNumberC(BamBam_AlignmentPut * aput, char const * tag
 	return ret;
 }
 
+#if ! defined(BAMBAMC_BAMONLY)
 int BamBam_CharBuffer_PutAlignment(
 	BamBam_AlignmentPut * aput,
 	/* flags */
@@ -609,3 +628,4 @@ int BamBam_CharBuffer_PutAuxNumber(BamBam_AlignmentPut * aput, char const * tag,
 	
 	return ret;
 }
+#endif

@@ -22,6 +22,7 @@
 
 #include <bambamc/BamBam_Config.h>
 
+#if ! defined(BAMBAMC_BAMONLY)
 #if defined(HAVE_SAM_H)
 #include <sam.h>
 #endif
@@ -38,4 +39,6 @@ typedef struct _BamBam_BamHeader
 
 extern BamBam_BamHeader * BamBam_BamHeader_New(BamBam_BamHeaderInfo * info) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern void BamBam_BamHeader_Delete(BamBam_BamHeader * header);
+#endif
+
 #endif

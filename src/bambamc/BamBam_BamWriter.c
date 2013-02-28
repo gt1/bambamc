@@ -30,6 +30,8 @@ BamBam_BamWriter * BamBam_BamWriter_Delete(BamBam_BamWriter * writer)
 		BamBam_AlignmentPut_Delete(writer->aput);
 		writer->aput = 0;
 
+		#if defined(BAMBAMC_BAMONLY)
+		#else
 		if ( writer->outfile )
 		{
 			bam_close(writer->outfile);
@@ -38,6 +40,7 @@ BamBam_BamWriter * BamBam_BamWriter_Delete(BamBam_BamWriter * writer)
 
 		BamBam_BamHeader_Delete(writer->header);
 		free(writer);
+		#endif
 	}
 	
 	return 0;
@@ -59,7 +62,6 @@ BamBam_BamWriter * BamBam_BamWriter_New(
 		
 	memset(writer,0,sizeof(BamBam_BamWriter));
 
-
 	if ( compressionLevel < 1 || compressionLevel > 9 )
 		return BamBam_BamWriter_Delete(writer);
 		
@@ -70,6 +72,8 @@ BamBam_BamWriter * BamBam_BamWriter_New(
 	if ( headerok < 0 )
 		return BamBam_BamWriter_Delete(writer);
 	
+	#if defined(BAMBAMC_BAMONLY)
+	#else
 	writer->header = BamBam_BamHeader_New(info);
 	
 	if ( ! writer->header )
@@ -81,6 +85,7 @@ BamBam_BamWriter * BamBam_BamWriter_New(
 		writer->outfile = bam_open(filename, &mode[0]);
 
 	bam_header_write(writer->outfile,writer->header->header);
+	#endif
 
 	writer->aput = BamBam_AlignmentPut_New();
 

@@ -27,18 +27,22 @@
 
 #include <bambamc/BamBam_Config.h>
 
+#if ! defined(BAMBAMC_BAMONLY)
 #if defined(HAVE_SAM_H)
 #include <sam.h>
 #endif
 #if defined(HAVE_SAMTOOLS_SAM_H)
 #include <samtools/sam.h>
 #endif
+#endif
 
 typedef struct _BamBam_AlignmentPut
 {
 	BamBam_CharBuffer * charbuffer;
 	BamBam_BamSingleAlignment * calignment;
+	#if ! defined(BAMBAMC_BAMONLY)
 	bam1_t * alignment;
+	#endif
 } BamBam_AlignmentPut;
 
 extern BamBam_AlignmentPut * BamBam_AlignmentPut_New() BAMBAM_WARN_IF_UNUSEDRESULT;
@@ -71,6 +75,7 @@ extern int BamBam_CharBuffer_PutAlignmentC(
 	) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern int BamBam_CharBuffer_PutAuxNumberC(BamBam_AlignmentPut * aput, char const * tag, char const type, void const * rvalue) BAMBAM_WARN_IF_UNUSEDRESULT;
 
+#if ! defined(BAMBAMC_BAMONLY)
 extern int BamBam_CharBuffer_PutAlignment(
 	BamBam_AlignmentPut * aput,
 	/* flags */
@@ -97,4 +102,5 @@ extern int BamBam_CharBuffer_PutAlignment(
 	int32_t const isize
 	) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern int BamBam_CharBuffer_PutAuxNumber(BamBam_AlignmentPut * aput, char const * tag, char const type, void const * rvalue) BAMBAM_WARN_IF_UNUSEDRESULT;
+#endif
 #endif

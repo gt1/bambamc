@@ -18,6 +18,7 @@
 **/
 #include <bambamc/BamBam_BamSingleAlignment_ToBam1.h>
 
+#if ! defined(BAMBAMC_BAMONLY)
 int BamBam_BamSingleAlignment_ToBam1(BamBam_BamSingleAlignment const * algn, bam1_t * bamalgn)
 {
 	uint32_t const coresize = sizeof(bamalgn->core);
@@ -58,3 +59,4 @@ int BamBam_BamSingleAlignment_ToBam1(BamBam_BamSingleAlignment const * algn, bam
 	
 	return 0;
 }
+#endif
