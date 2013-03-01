@@ -25,8 +25,9 @@
 #include <bambamc/BamBam_Config.h>
 #include <stdint.h>
 
-#if defined(BAMBAMC_BAMONLY)
 extern int BamBam_PutAlignmentFastQBuffer(BamBam_BamSingleAlignment * alignment,  char ** buffer,  unsigned int * bufferlen,  char const term);
+
+#if defined(BAMBAMC_BAMONLY)
 #else
 #if defined(HAVE_SAM_H)
 #include <sam.h>

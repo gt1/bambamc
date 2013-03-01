@@ -132,6 +132,8 @@ int runBamToFastQTest(int argc, char * argv[])
 	
 	BamBam_BamFileDecoder_Delete(decoder);
 	samclose(bamfile);
+	
+	return EXIT_SUCCESS;
 }
 #endif
 
