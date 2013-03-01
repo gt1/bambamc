@@ -1,3 +1,9 @@
+bambamc (0.0.38-1) UNRELEASED; urgency=low
+
+  * fix version script to match tag to configure version 
+
+ -- German Tischler <gt1@sanger.ac.uk>  Fri, 01 Mar 2013 15:53:49 +0000
+
 bambamc (0.0.37-1) UNRELEASED; urgency=low
 
   * added version bumping script 

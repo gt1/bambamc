@@ -19,5 +19,5 @@ git add configure.in
 git push
 
 git commit
-git tag -a bambamc_${FIRST}_${SECOND}_${THIRD} -m "bambamc version ${FIRST}_${SECOND}_${THIRD}"
-git push origin bambamc_${FIRST}_${SECOND}_${THIRD}
+git tag -a bambamc_${FIRST}_${SECOND}_${NEXTTHIRD} -m "bambamc version ${FIRST}_${SECOND}_${NEXTTHIRD}"
+git push origin bambamc_${FIRST}_${SECOND}_${NEXTTHIRD}
