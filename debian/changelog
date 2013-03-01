@@ -1,4 +1,10 @@
-bambamc (0.0.34-1) lucid; urgency=low
+bambamc (0.0.36-1) UNRELEASED; urgency=low
+
+  * added simpler bam writing interface
+
+ -- German Tischler <gt1@sanger.ac.uk>  Fri, 01 Mar 2013 15:13:29 +0000
+
+bambamc (0.0.34-1) UNRELEASED; urgency=low
 
   * removed support for libbam based input/output 
 
