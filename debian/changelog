@@ -1,3 +1,9 @@
+bambamc (0.0.33-1) UNRELEASED; urgency=low
+
+  * added support for reading/writing bam and reading sam without libbam
+
+ -- German Tischler <gt1@sanger.ac.uk>  Fri, 01 Mar 2013 13:48:28 +0000
+
 bambamc (0.0.30-1) UNRELEASED; urgency=low
 
   * Initial release
