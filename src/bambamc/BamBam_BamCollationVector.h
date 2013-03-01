@@ -38,8 +38,7 @@ extern void BamBam_BamCollationVector_Erase(BamBam_BamCollationVector * vector);
 extern int BamBam_BamCollationVector_Sort(
 	BamBam_BamCollationVector * vector,
 	BamBam_BamCollationOutputVector * outputvector,
-	BamBam_BamCollationTempFileGenerator * gen,
-	char const * bamheadertext
+	BamBam_BamCollationTempFileGenerator * gen
 ) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern void BamBam_BamCollationVector_Delete(BamBam_BamCollationVector * vector);
 #endif

@@ -22,29 +22,24 @@
 #include <bambamc/BamBam_BamAlignmentPut.h>
 #include <assert.h>
 
-int testLibBamFree(FILE * file)
+int testLibBamFree(char const * filename)
 {
 	int r = -1;
 	BamBam_BamHeaderInfo * hi = 0;
-	BamBam_BgzfCompressor * bgzf = 0;
-	BamBam_AlignmentPut * bap = 0;
+	BamBam_BamWriter * writer = 0;
+	int const compressionLevel = 1;
+	int status = -1;
 	
 	hi = BamBam_BamHeaderInfo_New("1.4","unknown",0);
 	assert ( hi );
 	r = BamBam_BamHeaderInfo_AddChromosome(hi, "chr1",10000);
 	assert ( ! r );
 
-	bgzf = BamBam_BgzfCompressor_NewFP(file,1);
-	assert ( bgzf );
+	writer = BamBam_BamWriter_New(hi,filename,compressionLevel);
+	assert ( writer );
 	
-	r = BamBam_BamHeaderInfo_WriteBamHeader(hi,bgzf);
-	assert ( r >= 0 );
-	
-	bap = BamBam_AlignmentPut_New();
-	assert ( bap );
-
-	r = BamBam_CharBuffer_PutAlignmentC(
-		bap,
+	r = BamBam_BamWriter_PutAlignment(
+		writer,
 		0,
 		0,
 		5000,
@@ -55,32 +50,25 @@ int testLibBamFree(FILE * file)
 		"HHHHHHHH",
 		"8M",
 		60,
-		100);		
+		100);
 	assert ( r >= 0 );
+
 	int val = 61;
-	r = BamBam_CharBuffer_PutAuxNumberC(bap,"AS",'i',&val);
-	assert ( ! r );
-	int val2 = 5;
-	r = BamBam_CharBuffer_PutAuxNumberC(bap,"NM",'i',&val2);
-	assert ( ! r );
-	
-	r = BamBam_BamSingleAlignment_StoreAlignmentBgzf(bap->calignment,bgzf);
+	r = BamBam_BamWriter_PutAuxNumber(writer,"AS",'i',&val);
 	assert ( r >= 0 );
 	
-	r = BamBam_BgzfCompressor_Terminate(bgzf);
+	r = BamBam_BamWriter_Commit(writer);
 	assert ( r >= 0 );
 	
-	BamBam_BgzfCompressor_Delete(bgzf);
-	BamBam_AlignmentPut_Delete(bap);
+	BamBam_BamWriter_Delete(writer,&status);
+	assert ( status >= 0 );
 	BamBam_BamHeaderInfo_Delete(hi);
-	
-	fflush(file);
-	
+		
 	return 0;
 }
 
 int main()
 {
-	return testLibBamFree(stdout);
+	return testLibBamFree("-");
 	return 0;
 }

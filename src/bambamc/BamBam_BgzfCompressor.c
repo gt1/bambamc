@@ -221,6 +221,14 @@ static BamBam_BgzfCompressor * BamBam_BgzfCompressor_Setup(BamBam_BgzfCompressor
 
 BamBam_BgzfCompressor * BamBam_BgzfCompressor_New(char const * filename, int const level)
 {
+	if ( strcmp(filename,"-") == 0 )
+		return BamBam_BgzfCompressor_NewFP(stdout,level);
+	else
+		return BamBam_BgzfCompressor_NewFilename(filename,level);
+}
+
+BamBam_BgzfCompressor * BamBam_BgzfCompressor_NewFilename(char const * filename, int const level)
+{
 	BamBam_BgzfCompressor * object = 0;
 	
 	object = (BamBam_BgzfCompressor *)malloc(sizeof(BamBam_BgzfCompressor));

@@ -121,7 +121,7 @@ void samBamSamTest()
 	BamBam_SamBamFileDecoder_Delete(samdec);
 }
 
-int main(int argc, char * argv[])
+int main(/* int argc, char * argv[] */)
 {
 	runCollationTest();	
 	/* lineBufferTest(); */

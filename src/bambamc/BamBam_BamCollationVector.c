@@ -66,8 +66,7 @@ void BamBam_BamCollationVector_Erase(BamBam_BamCollationVector * vector)
 int BamBam_BamCollationVector_Sort(
 	BamBam_BamCollationVector * vector,
 	BamBam_BamCollationOutputVector * outputvector,
-	BamBam_BamCollationTempFileGenerator * gen,
-	char const * bamheadertext
+	BamBam_BamCollationTempFileGenerator * gen
 )
 {
 	uint64_t i, j;

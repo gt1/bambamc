@@ -26,11 +26,39 @@
 typedef struct _BamBam_BamWriter
 {
 	BamBam_AlignmentPut * aput;
+	BamBam_BgzfCompressor * bgzf;
 } BamBam_BamWriter;
 
-extern BamBam_BamWriter * BamBam_BamWriter_Delete(BamBam_BamWriter * writer);
+extern BamBam_BamWriter * BamBam_BamWriter_Delete(BamBam_BamWriter * writer, int * termstatus);
 extern BamBam_BamWriter * BamBam_BamWriter_New(
 	BamBam_BamHeaderInfo * info,
 	char const * filename,
 	int compressionLevel) BAMBAM_WARN_IF_UNUSEDRESULT;
+extern int BamBam_BamWriter_PutAlignment(
+	BamBam_BamWriter * writer,
+	/* flags */
+	int32_t const flags,
+	/* target (chromosome) id */
+	int32_t const tid,
+	/* position on chromosome (0 based) */
+	uint64_t const rpos,
+	/* mate target id */
+	int32_t const mtid,
+	/* position of mate on mate target id */
+	uint64_t const rmpos,
+	/* sequence name */
+	char const * name,
+	/* query sequence (read) */
+	char const * query,
+	/* quality string */
+	char const * qual,
+	/* cigar operations */
+	char const * cigar,
+	/* mapping quality */
+	int32_t const rqual,
+	/* insert size */
+	int32_t const isize
+	) BAMBAM_WARN_IF_UNUSEDRESULT;
+extern int BamBam_BamWriter_PutAuxNumber(BamBam_BamWriter * writer, char const * tag, char const type, void const * rvalue) BAMBAM_WARN_IF_UNUSEDRESULT;
+extern int BamBam_BamWriter_Commit(BamBam_BamWriter * writer);
 #endif

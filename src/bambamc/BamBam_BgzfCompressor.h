@@ -60,6 +60,7 @@ typedef struct _BamBam_BgzfCompressor
 } BamBam_BgzfCompressor;
 
 extern BamBam_BgzfCompressor * BamBam_BgzfCompressor_New(char const * filename, int const level) BAMBAM_WARN_IF_UNUSEDRESULT;
+extern BamBam_BgzfCompressor * BamBam_BgzfCompressor_NewFilename(char const * filename, int const level) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern BamBam_BgzfCompressor * BamBam_BgzfCompressor_NewFP(FILE * rfile, int const level) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern BamBam_BgzfCompressor * BamBam_BgzfCompressor_Delete(BamBam_BgzfCompressor * object);
 extern int BamBam_BgzfCompressor_Flush(BamBam_BgzfCompressor * object) BAMBAM_WARN_IF_UNUSEDRESULT;

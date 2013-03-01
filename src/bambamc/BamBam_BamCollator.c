@@ -246,8 +246,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 							{
 								int sortok;
 								
-								sortok = BamBam_BamCollationVector_Sort(collator->vector,collator->outputvector,collator->gen,
-									(char const *)(collator->headerinfo->cb->buffer));
+								sortok = BamBam_BamCollationVector_Sort(collator->vector,collator->outputvector,collator->gen);
 								
 								if ( sortok < 0 )
 								{
@@ -284,8 +283,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 					if ( vecfull )
 					{
 						/* fprintf(stderr,"erasing full vector.\n"); */
-						sortok = BamBam_BamCollationVector_Sort(collator->vector,collator->outputvector,collator->gen,
-							(char const *)(collator->headerinfo->cb->buffer));
+						sortok = BamBam_BamCollationVector_Sort(collator->vector,collator->outputvector,collator->gen);
 				
 						if ( sortok < 0 )
 							collator->state = BAMBAM_COLLATE_FAILED;
@@ -294,8 +292,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 					}
 				}
 
-			sortok = BamBam_BamCollationVector_Sort(collator->vector,collator->outputvector,collator->gen,
-				(char const *)(collator->headerinfo->cb->buffer));
+			sortok = BamBam_BamCollationVector_Sort(collator->vector,collator->outputvector,collator->gen);
 			if ( sortok < 0 )
 				collator->state = BAMBAM_COLLATE_FAILED;
 			BamBam_BamCollationVector_Erase(collator->vector);
