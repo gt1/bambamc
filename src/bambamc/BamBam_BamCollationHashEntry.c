@@ -19,6 +19,7 @@
 
 #include <bambamc/BamBam_BamCollationHashEntry.h>
 #include <bambamc/BamBam_BamFlagBase.h>
+#include <bambamc/BamBam_StrDup.h>
 
 int BamBam_BamHashEntry_Compare(BamBam_BamCollationHashEntry const * A, BamBam_BamCollationHashEntry const * B)
 {
@@ -111,7 +112,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollationHashEntry_NewDup(BamBam_BamSin
 		return 0;
 	}
 	
-	hashentry->qname = strdup(qname);
+	hashentry->qname = BamBam_StrDup(qname);
 	
 	if ( ! hashentry->qname )
 	{

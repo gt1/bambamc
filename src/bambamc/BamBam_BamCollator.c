@@ -20,6 +20,7 @@
 #include <bambamc/BamBam_BamCollator.h>
 #include <bambamc/BamBam_CharBuffer.h>
 #include <bambamc/BamBam_LineParsing.h>
+#include <bambamc/BamBam_StrDup.h>
 #include <assert.h>
 #include <ctype.h>
 
@@ -591,7 +592,7 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 	if ( collator->tmpdirstate == BAMBAM_TMPDIR_FAILED )
 		return BamBam_BamCollator_Delete(collator);
 	
-	collator->tempdirname = strdup(tempdirname);
+	collator->tempdirname = BamBam_StrDup(tempdirname);
 	
 	if ( ! collator->tempdirname )
 		return BamBam_BamCollator_Delete(collator);
@@ -628,7 +629,7 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 	if ( ! collator->decoder )
 		return BamBam_BamCollator_Delete(collator);
 	
-	collator->bamheadertext = strdup(collator->decoder->header->headertext);
+	collator->bamheadertext = BamBam_StrDup(collator->decoder->header->headertext);
 	
 	if ( ! collator->bamheadertext )
 		return BamBam_BamCollator_Delete(collator);
@@ -704,13 +705,13 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 
 		if ( ! collator->vn )
 		{
-			collator->vn = strdup("1.4");
+			collator->vn = BamBam_StrDup("1.4");
 			if ( ! collator->vn )
 				return BamBam_BamCollator_Delete(collator);
 		}
 		if ( ! collator->so )
 		{
-			collator->so = strdup("unknown");
+			collator->so = BamBam_StrDup("unknown");
 			if ( ! collator->so )
 				return BamBam_BamCollator_Delete(collator);
 		}
@@ -790,13 +791,13 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 
 	if ( ! collator->vn )
 	{
-		collator->vn = strdup("1.4");
+		collator->vn = BamBam_StrDup("1.4");
 		if ( ! collator->vn )
 			return BamBam_BamCollator_Delete(collator);
 	}
 	if ( ! collator->so )
 	{
-		collator->so = strdup("unknown");
+		collator->so = BamBam_StrDup("unknown");
 		if ( ! collator->so )
 			return BamBam_BamCollator_Delete(collator);
 	}

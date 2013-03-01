@@ -16,7 +16,7 @@ libbambamc_la_SOURCES = \
 	bambamc/BamBam_GzipWriter.c	bambamc/BamBam_GzipFileDecoder.c \
 	bambamc/BamBam_BgzfCompressor.c bambamc/BamBam_LineBuffer.c \
 	bambamc/BamBam_SamInfo.c	bambamc/BamBam_SamFileDecoder.c \
-	bambamc/BamBam_SamBamFileDecoder.c
+	bambamc/BamBam_SamBamFileDecoder.c	bambamc/BamBam_StrDup.c
 libbambamc_includedir=$(includedir)/bambamc
 libbambamc_include_HEADERS= \
 	bambamc/BamBam_BamAlignmentPut.h		bambamc/BamBam_BamFlagBase.h		    bambamc/BamBam_FormatAlignment.h \
@@ -32,7 +32,7 @@ libbambamc_include_HEADERS= \
 	bambamc/BamBam_GzipWriter.h	bambamc/BamBam_GzipFileDecoder.h \
 	bambamc/BamBam_BgzfCompressor.h bambamc/BamBam_LineBuffer.h \
 	bambamc/BamBam_SamInfo.h	bambamc/BamBam_SamFileDecoder.h \
-	bambamc/BamBam_SamBamFileDecoder.h
+	bambamc/BamBam_SamBamFileDecoder.h	bambamc/BamBam_StrDup.h
 libbambamc_la_CPPFLAGS=${AM_CPPFLAGS}
 libbambamc_la_LDFLAGS=${ZLIBLDFLAGS} -version-info ${LIBRARY_VERSION}
 libbambamc_la_LIBADD=${ZLIBLIBS}

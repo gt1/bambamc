@@ -19,6 +19,7 @@
 
 #include <bambamc/BamBam_LineParsing.h>
 #include <bambamc/BamBam_CharBuffer.h>
+#include <bambamc/BamBam_StrDup.h>
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
@@ -121,7 +122,7 @@ char * BamBam_filterHeader(char const * header, char const ** filters)
 		return 0;
 	}
 	
-	filtered = strdup((char const *)(buffer->buffer));
+	filtered = BamBam_StrDup((char const *)(buffer->buffer));
 	
 	if ( ! filtered )
 	{

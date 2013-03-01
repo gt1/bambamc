@@ -18,6 +18,7 @@
 **/
 
 #include <bambamc/BamBam_BamHeaderInfo.h>
+#include <bambamc/BamBam_StrDup.h>
 #include <string.h>
 #include <assert.h>
 
@@ -85,19 +86,19 @@ BamBam_BamHeaderInfo * BamBam_BamHeaderInfo_New(char const * version, char const
 		
 	memset(info,0,sizeof(BamBam_BamHeaderInfo));
 
-	info->sortorder = strdup(sortorder);
+	info->sortorder = BamBam_StrDup(sortorder);
 
 	if ( ! info->sortorder )
 		return BamBam_BamHeaderInfo_Delete(info);
 		
-	info->version = strdup(version);
+	info->version = BamBam_StrDup(version);
 
 	if ( ! info->version )
 		return BamBam_BamHeaderInfo_Delete(info);
 	
 	if ( plaintext )
 	{
-		info->plaintext = strdup(plaintext);
+		info->plaintext = BamBam_StrDup(plaintext);
 
 		if ( ! info->plaintext )
 			return BamBam_BamHeaderInfo_Delete(info);

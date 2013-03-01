@@ -18,6 +18,7 @@
 **/
 
 #include <bambamc/BamBam_FormatNumber.h>
+#include <bambamc/BamBam_StrDup.h>
 #include <stdio.h>
 #include <alloca.h>
 
@@ -84,7 +85,7 @@ char * BamBam_FormatNumberMinLenAlt(uint64_t const num, int const minlen)
 		tnum /= 10;
 	}
 	
-	return strdup(s);
+	return BamBam_StrDup(s);
 }
 
 char * BamBam_FormatNumberMinLen(uint64_t const num, int minlen)

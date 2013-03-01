@@ -18,6 +18,7 @@
 **/
 #include <bambamc/BamBam_BamFileHeader.h>
 #include <bambamc/BamBam_LineParsing.h>
+#include <bambamc/BamBam_StrDup.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -236,13 +237,13 @@ static BamBam_BamFileHeader * parseHeaderText(BamBam_BamFileHeader * header)
 	
 	if ( ! header->version )
 	{
-		header->version = strdup("1.4");
+		header->version = BamBam_StrDup("1.4");
 		if ( ! header->version )
 			return BamBam_BamFileHeader_Delete(header);
 	}
 	if ( ! header->sortorder )
 	{
-		header->sortorder = strdup("unknown");
+		header->sortorder = BamBam_StrDup("unknown");
 		if ( ! header->sortorder )
 			return BamBam_BamFileHeader_Delete(header);
 	}
@@ -455,7 +456,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_SAM(FILE * reader)
 				return BamBam_BamFileHeader_Delete(header);
 			}
 			
-			chr->headerline = strdup(*hc);
+			chr->headerline = BamBam_StrDup(*hc);
 			
 			if ( ! chr->headerline )
 			{
@@ -513,7 +514,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_SAM(FILE * reader)
 	}
 	#endif
 	
-	header->headertext = strdup(header->text);
+	header->headertext = BamBam_StrDup(header->text);
 	
 	if ( ! header->headertext )
 	{	
@@ -882,7 +883,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 					free(cname);
 					cname = 0;
 					
-					header->sortedchromosomevec[r]->headerline = strdup(*hc);
+					header->sortedchromosomevec[r]->headerline = BamBam_StrDup(*hc);
 					
 					if ( ! header->sortedchromosomevec[r]->headerline )
 					{
@@ -964,7 +965,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 		return BamBam_BamFileHeader_Delete(header);	
 	}
 	
-	header->headertext = strdup((char const *)(htextbuf->buffer));
+	header->headertext = BamBam_StrDup((char const *)(htextbuf->buffer));
 
 	if ( ! header->headertext )
 	{

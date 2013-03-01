@@ -19,4 +19,6 @@
 #if ! defined(BAMBAMC_STRDUP_H)
 #define BAMBAMC_STRDUP_H
 
+extern char * BamBam_StrDup(char const * s);
+extern char * BamBam_StrCat(char const * sa, char const * sb);
 #endif

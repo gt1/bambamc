@@ -18,6 +18,7 @@
 **/
 
 #include <bambamc/BamBam_Chromosome.h>
+#include <bambamc/BamBam_StrDup.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,7 +31,7 @@ BamBam_Chromosome * BamBam_Chromosome_New(char const * rname, uint64_t const rle
 		
 	memset(chr,0,sizeof(BamBam_Chromosome));
 
-	chr->name = strdup(rname);
+	chr->name = BamBam_StrDup(rname);
 	
 	if ( ! chr->name )
 	{

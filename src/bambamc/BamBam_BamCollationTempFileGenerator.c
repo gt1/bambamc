@@ -18,6 +18,7 @@
 **/
 
 #include <bambamc/BamBam_BamCollationTempFileGenerator.h>
+#include <bambamc/BamBam_StrDup.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -130,7 +131,7 @@ BamBam_BamCollationTempFileGenerator * BamBam_BamCollationTempFileGenerator_New(
 	if ( ! gen )
 		return 0;
 		
-	gen->prefix = strdup(prefix);
+	gen->prefix = BamBam_StrDup(prefix);
 	
 	if ( ! gen->prefix )
 	{
