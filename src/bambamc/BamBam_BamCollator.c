@@ -175,7 +175,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 	while ( (collator->state==BAMBAM_COLLATE_READING_INPUT) && !collator->outputvector->outputvectorfill )
 	{
 		#if defined(BAMBAMC_BAMONLY)
-		if ( (collator->alignment = BamBam_BamFileDecoder_DecodeAlignment(collator->decoder)) )
+		if ( (collator->alignment = BamBam_SamBamFileDecoder_DecodeAlignment(collator->decoder)) )
 		#else
 		if ( samread(collator->bamfile,collator->alignment) >= 0 )
 		#endif
@@ -554,7 +554,7 @@ BamBam_BamCollator * BamBam_BamCollator_Delete(BamBam_BamCollator * collator)
 
 		#if defined(BAMBAMC_BAMONLY)
 		if ( collator->decoder )
-			BamBam_BamFileDecoder_Delete(collator->decoder);
+			BamBam_SamBamFileDecoder_Delete(collator->decoder);
 		#else
 		if ( collator->bamfile )
 			samclose(collator->bamfile);
@@ -660,7 +660,7 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 		return BamBam_BamCollator_Delete(collator);
 
 	#if defined(BAMBAMC_BAMONLY)
-	collator->decoder = BamBam_BamFileDecoder_New(inputfilename);
+	collator->decoder = BamBam_SamBamFileDecoder_New(inputfilename,mode);
 	
 	if ( ! collator->decoder )
 		return BamBam_BamCollator_Delete(collator);

@@ -53,4 +53,6 @@ typedef struct _BamBam_BamFileHeader
 extern BamBam_BamFileHeader * BamBam_BamFileHeader_New_SAM(FILE * reader);
 extern BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader);
 extern BamBam_BamFileHeader * BamBam_BamFileHeader_Delete(BamBam_BamFileHeader * object);
+extern BamBam_Chromosome const * BamBam_BamFileHeader_FindChromosomeByName(BamBam_BamFileHeader const * header, char const * name);
+extern int BamBam_BamFileHeader_FindChromosomeIdByName(BamBam_BamFileHeader const * header, char const * name);
 #endif

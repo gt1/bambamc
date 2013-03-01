@@ -16,10 +16,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#include <bambamc/BamBam_BgzfCompressor.h>
-
+#include <bambamc/BamBam_LineBuffer.h>
 #include <bambamc/BamBam_BamCollator.h>
 #include <bambamc/BamBam_FormatAlignment.h>
+#include <bambamc/BamBam_SamBamFileDecoder.h>
 #include <assert.h>
 
 int runCollationTest()
@@ -33,7 +33,7 @@ int runCollationTest()
 	int aok, bok;
 	
 	/* allocate collator */
-	col = BamBam_BamCollator_New("tmpdir",16,16,"bam","-");
+	col = BamBam_BamCollator_New("tmpdir",16,16,"sam","-");
 	
 	if ( ! col )
 	{
@@ -76,11 +76,10 @@ int runCollationTest()
 	return 0;
 }
 
-#include <bambamc/BamBam_BamFileDecoder.h>
 
-int main(int argc, char * argv[])
+#if ! defined(BAMBAMC_BAMONLY)
+int runBamToFastQTest(int argc, char * argv[])
 {
-	#if 0
 	if ( 1 >= argc )
 	{
 		fprintf(stderr,"usage: %s <bamfile>\n", argv[0]);
@@ -133,9 +132,65 @@ int main(int argc, char * argv[])
 	
 	BamBam_BamFileDecoder_Delete(decoder);
 	samclose(bamfile);
-	#endif
+}
+#endif
+
+
+void lineBufferTest()
+{
+	char const * pa = 0;
+	char const * pe = 0;
+	unsigned int numlines = 0;
+	BamBam_LineBuffer * lb = BamBam_LineBuffer_New(stdin,1024);
+	assert ( lb );
 	
-	runCollationTest();
+	while ( ! BamBam_LineBuffer_GetLine(lb,&pa,&pe) )
+	{
+		if ( pe != pa && pa[0] == '@' )
+		{
+			fprintf(stderr,"Header line: ");
+			fwrite(pa,pe-pa,1,stderr);
+			fprintf(stderr,"\n");
+		}
+		else
+		{
+			BamBam_LineBuffer_PutBack(lb,pa);
+			break;
+		}
+	}
+	while ( ! BamBam_LineBuffer_GetLine(lb,&pa,&pe) )
+	{
+		fprintf(stderr,"Non header line: ");
+		fwrite(pa,pe-pa,1,stderr);
+		fprintf(stderr,"\n");
+	}
+	
+	BamBam_LineBuffer_Delete(lb);
+	
+	fprintf(stderr,"number of lines is %u\n", numlines);
+
+}
+
+void samBamSamTest()
+{
+	BamBam_SamBamFileDecoder * samdec = BamBam_SamBamFileDecoder_New("-","r");
+	BamBam_BamSingleAlignment * algn = 0;
+	assert ( samdec );
+
+	while ( (algn = BamBam_SamBamFileDecoder_DecodeAlignment(samdec)) )
+	{
+		char const * name = BamBam_BamSingleAlignment_GetReadName(algn);
+		fprintf(stderr,"%s\n", name);
+	}
+	
+	BamBam_SamBamFileDecoder_Delete(samdec);
+}
+
+int main(int argc, char * argv[])
+{
+	runCollationTest();	
+	// lineBufferTest();
+	
 	
 	return EXIT_SUCCESS;
 }

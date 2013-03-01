@@ -274,6 +274,21 @@ static int findChromosomeByName(
 	return -1;
 }
 
+int BamBam_BamFileHeader_FindChromosomeIdByName(BamBam_BamFileHeader const * header, char const * name)
+{
+	return findChromosomeByName((BamBam_Chromosome const **)header->sortedchromosomevec,header->n_ref,name);
+}
+
+BamBam_Chromosome const * BamBam_BamFileHeader_FindChromosomeByName(BamBam_BamFileHeader const * header, char const * name)
+{
+	int const r = BamBam_BamFileHeader_FindChromosomeIdByName(header,name);
+
+	if ( r < 0 )
+		return 0;
+	else
+		return header->sortedchromosomevec[r];
+}
+
 BamBam_BamFileHeader * BamBam_BamFileHeader_New_SAM(FILE * reader)
 {
 	BamBam_BamFileHeader * header = 0;

@@ -27,7 +27,7 @@
 #include <bambamc/BamBam_MergeHeapEntry.h>
 #include <bambamc/BamBam_BamHeader.h>
 #include <bambamc/BamBam_BamHeaderInfo.h>
-#include <bambamc/BamBam_BamFileDecoder.h>
+#include <bambamc/BamBam_SamBamFileDecoder.h>
 #include <bambamc/BamBam_GzipFileDecoder.h>
 
 #include <bambamc/BamBam_Config.h>
@@ -53,7 +53,7 @@ typedef struct _BamBam_BamCollator
 	BamBam_BamCollationOutputVector * outputvector;
 
 	#if defined(BAMBAMC_BAMONLY)
-	BamBam_BamFileDecoder * decoder;
+	BamBam_SamBamFileDecoder * decoder;
 	#else
 	samfile_t * bamfile;
 	#endif

@@ -14,7 +14,9 @@ libbambamc_la_SOURCES = \
 	bambamc/BamBam_BamAlignmentPut.c	bambamc/BamBam_BamSingleAlignment.c \
 	bambamc/BamBam_BamFileDecoder.c	bambamc/BamBam_BamSingleAlignment_ToBam1.c \
 	bambamc/BamBam_GzipWriter.c	bambamc/BamBam_GzipFileDecoder.c \
-	bambamc/BamBam_BgzfCompressor.c
+	bambamc/BamBam_BgzfCompressor.c bambamc/BamBam_LineBuffer.c \
+	bambamc/BamBam_SamInfo.c	bambamc/BamBam_SamFileDecoder.c \
+	bambamc/BamBam_SamBamFileDecoder.c
 libbambamc_includedir=$(includedir)/bambamc
 libbambamc_include_HEADERS= \
 	bambamc/BamBam_BamAlignmentPut.h		bambamc/BamBam_BamFlagBase.h		    bambamc/BamBam_FormatAlignment.h \
@@ -28,7 +30,9 @@ libbambamc_include_HEADERS= \
 	bambamc/BamBam_BamFileDecoder.h			bambamc/BamBam_CollatorState.h		    bambamc/BamBam_Unused.h \
 	bambamc/BamBam_BamFileHeader.h			bambamc/BamBam_FastQRead.h                  bambamc/BamBam_Config.h \
 	bambamc/BamBam_GzipWriter.h	bambamc/BamBam_GzipFileDecoder.h \
-	bambamc/BamBam_BgzfCompressor.h
+	bambamc/BamBam_BgzfCompressor.h bambamc/BamBam_LineBuffer.h \
+	bambamc/BamBam_SamInfo.h	bambamc/BamBam_SamFileDecoder.h \
+	bambamc/BamBam_SamBamFileDecoder.h
 libbambamc_la_CPPFLAGS=${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
 libbambamc_la_LDFLAGS=${SAMTOOLSLDFLAGS} ${ZLIBLDFLAGS} @BAMBAMCSTATIC@ -version-info ${LIBRARY_VERSION}
 libbambamc_la_LIBADD=${SAMTOOLSLIBS} ${ZLIBLIBS}
