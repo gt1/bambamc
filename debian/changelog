@@ -1,3 +1,9 @@
+bambamc (0.0.37-1) UNRELEASED; urgency=low
+
+  * added version bumping script 
+
+ -- German Tischler <gt1@sanger.ac.uk>  Fri, 01 Mar 2013 15:52:44 +0000
+
 bambamc (0.0.36-1) UNRELEASED; urgency=low
 
   * added simpler bam writing interface

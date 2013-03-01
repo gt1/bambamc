@@ -8,8 +8,16 @@ NEXTTHIRD=`expr ${THIRD} + 1`
 awk -v first=${FIRST} -v second=${SECOND} -v third=${THIRD} '/^AC_INIT/ {gsub(first"."second"."third,first"."second"."third+1);print} ; !/^AC_INIT/{print}' < configure.in | \
 	awk -v first=${FIRST} -v second=${SECOND} -v third=${THIRD} '/^LIBRARY_VERSION=/ {gsub("="first"."third"."second,"="first":"third+1"."second);print} ; !/^LIBRARY_VERSION=/{print}' \
 	> configure.in.tmp
-# mv configure.in.tmp configure.in
+mv configure.in.tmp configure.in
 
 pushd debian
 dch --distribution UNRELEASED -v ${FIRST}.${SECOND}.${NEXTTHIRD}-1
 popd
+
+git add debian/changelog
+git add configure.in
+git push
+
+git commit
+git tag -a bambamc_${FIRST}_${SECOND}_${THIRD} -m "bambamc version ${FIRST}_${SECOND}_${THIRD}"
+git push origin bambamc_${FIRST}_${SECOND}_${THIRD}
