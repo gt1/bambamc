@@ -56,7 +56,7 @@ void BamBam_BamCollator_MergeHeapCheck(BamBam_BamCollator * collator)
 	}
 }
 
-static inline uint64_t BamBam_BamCollator_MergeHeapMinimum2(BamBam_BamCollator * collator, uint64_t p0, uint64_t p1)
+static unsigned int BamBam_BamCollator_MergeHeapMinimum2(BamBam_BamCollator * collator, unsigned int p0, unsigned int p1)
 {
 	BamBam_MergeHeapEntry * Pp0 = &(collator->mergeheap[p0]);
 	BamBam_MergeHeapEntry * Pp1 = &(collator->mergeheap[p1]);
@@ -67,7 +67,7 @@ static inline uint64_t BamBam_BamCollator_MergeHeapMinimum2(BamBam_BamCollator *
 		return p1;
 }
 
-static inline uint64_t BamBam_BamCollator_MergeHeapMinimum3(BamBam_BamCollator * collator, uint64_t p0, uint64_t p1, uint64_t p2)
+static unsigned int BamBam_BamCollator_MergeHeapMinimum3(BamBam_BamCollator * collator, unsigned int p0, unsigned int p1, unsigned int p2)
 {
 	return BamBam_BamCollator_MergeHeapMinimum2(collator,p0,BamBam_BamCollator_MergeHeapMinimum2(collator,p1,p2));
 }
@@ -82,7 +82,7 @@ void BamBam_BamCollator_MergeHeapDeleteMinimum(BamBam_BamCollator * collator)
 {
 	BamBam_MergeHeapEntry * first;
 	BamBam_MergeHeapEntry * last;
-	uint64_t p = 0;
+	unsigned int p = 0;
 
 	assert ( collator->mergeheapfill );	
 
@@ -101,7 +101,7 @@ void BamBam_BamCollator_MergeHeapDeleteMinimum(BamBam_BamCollator * collator)
 		if ( 2*p+2 < collator->mergeheapfill )
 		{
 			/* find minimum of this node and both children */
-			uint64_t const mini = BamBam_BamCollator_MergeHeapMinimum3(collator,p,2*p+1,2*p+2);
+			unsigned int const mini = BamBam_BamCollator_MergeHeapMinimum3(collator,p,2*p+1,2*p+2);
 			
 			/* if minimum is this node, then heap property holds */
 			if ( mini == p )
@@ -137,9 +137,9 @@ void BamBam_BamCollator_MergeHeapDeleteMinimum(BamBam_BamCollator * collator)
 	}
 }
 
-void BamBam_BamCollator_MergeHeapInsert(BamBam_BamCollator * collator, BamBam_BamCollationHashEntry * hashentry, uint64_t fileid)
+void BamBam_BamCollator_MergeHeapInsert(BamBam_BamCollator * collator, BamBam_BamCollationHashEntry * hashentry, unsigned int fileid)
 {
-	uint64_t p;
+	unsigned int p;
 	int swapped = 1;
 	
 	/* insert new element at the end of the heap */
@@ -151,7 +151,7 @@ void BamBam_BamCollator_MergeHeapInsert(BamBam_BamCollator * collator, BamBam_Ba
 	/* move it up */
 	while ( p && swapped )
 	{
-		uint64_t parent = (p-1)/2;
+		unsigned int parent = (p-1)/2;
 		BamBam_MergeHeapEntry * Pp = &(collator->mergeheap[p]);
 		BamBam_MergeHeapEntry * Pparent = &(collator->mergeheap[parent]);
 		
@@ -174,11 +174,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 {
 	while ( (collator->state==BAMBAM_COLLATE_READING_INPUT) && !collator->outputvector->outputvectorfill )
 	{
-		#if defined(BAMBAMC_BAMONLY)
 		if ( (collator->alignment = BamBam_SamBamFileDecoder_DecodeAlignment(collator->decoder)) )
-		#else
-		if ( samread(collator->bamfile,collator->alignment) >= 0 )
-		#endif
 		{
 			BamBam_BamCollationHashEntry * nhashentry = 0;
 			BamBam_BamCollationHashEntry * ohashentry = 0;
@@ -271,7 +267,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 		else
 		{
 			/* handle alignments left in hash table */
-			uint64_t i = 0;
+			unsigned int i = 0;
 			int sortok;
 			
 			for ( i = 0; collator->state != BAMBAM_COLLATE_FAILED && i < collator->hash->tablesize; ++i )
@@ -312,16 +308,12 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 		/* tempfiles not yet open, open them */
 		if ( ! collator->mergefiles )
 		{
-			uint64_t numtempfiles;
+			unsigned int numtempfiles;
 			BamBam_ListNode * node = 0;
-			uint64_t k = 0;
+			unsigned int k = 0;
 			
 			numtempfiles = BamBam_List_Size(collator->gen->tempfilenames);			
-			#if defined(BAMBAMC_BAMONLY)
 			collator->mergefiles = (BamBam_GzipFileDecoder **)malloc(numtempfiles * sizeof(BamBam_GzipFileDecoder *));
-			#else
-			collator->mergefiles = (samfile_t **)malloc(numtempfiles * sizeof(samfile_t *));
-			#endif
 			
 			if ( ! collator->mergefiles )
 				collator->state = BAMBAM_COLLATE_FAILED;
@@ -338,11 +330,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 				{
 					char const * filename = (char const *)(node->entry);
 					
-					#if defined(BAMBAMC_BAMONLY)
 					collator->mergefiles[k] = BamBam_GzipFileDecoder_New(filename);
-					#else
-					collator->mergefiles[k] = samopen(filename,"rb",0);
-					#endif
 				
 					if ( ! collator->mergefiles[k] )
 						collator->state = BAMBAM_COLLATE_FAILED;
@@ -370,11 +358,7 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 
 					for ( k = 0; (collator->state != BAMBAM_COLLATE_FAILED) && k < numtempfiles; ++k )
 					{
-						#if defined(BAMBAMC_BAMONLY)
 						if ( (collator->alignment = BamBam_GzipFileDecoder_DecodeAlignment(collator->mergefiles[k])) )
-						#else
-						if ( samread(collator->mergefiles[k],collator->alignment) >= 0 )
-						#endif
 						{
 							BamBam_BamCollationHashEntry * nhashentry = 0;
 							nhashentry = BamBam_BamCollationHashEntry_NewDup(collator->alignment);
@@ -404,18 +388,14 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 			{
 				BamBam_MergeHeapEntry * mini = BamBam_BamCollator_MergeHeapMinimum(collator);
 				BamBam_BamCollationHashEntry * hashentry = mini->hashentry;
-				uint64_t const fileid = mini->fileid;
+				unsigned int const fileid = mini->fileid;
 
 				BamBam_BamCollationOutputVector_PushBack(collator->outputvector,hashentry);
 				
 				mini->hashentry = 0;
 				BamBam_BamCollator_MergeHeapDeleteMinimum(collator);
 
-				#if defined(BAMBAMC_BAMONLY)
 				if ( (collator->alignment = BamBam_GzipFileDecoder_DecodeAlignment(collator->mergefiles[fileid])) )
-				#else
-				if ( samread(collator->mergefiles[fileid],collator->alignment) >= 0 )
-				#endif
 				{
 					BamBam_BamCollationHashEntry * nhashentry = 0;
 					nhashentry = BamBam_BamCollationHashEntry_NewDup(collator->alignment);
@@ -521,17 +501,13 @@ BamBam_BamCollator * BamBam_BamCollator_Delete(BamBam_BamCollator * collator)
 		free(collator->so);
 		free(collator->bufferA);
 		free(collator->bufferB);
-		uint64_t k;
+		unsigned int k;
 		if ( collator->mergefiles )
 		{
 			for ( k = 0; k < collator->nummergefiles; ++k )
 				if ( collator->mergefiles[k] )
 				{
-					#if defined(BAMBAMC_BAMONLY)
 					BamBam_GzipFileDecoder_Delete(collator->mergefiles[k]);
-					#else
-					samclose(collator->mergefiles[k]);
-					#endif
 					collator->mergefiles[k] = 0;
 				}
 			free(collator->mergefiles);
@@ -547,18 +523,9 @@ BamBam_BamCollator * BamBam_BamCollator_Delete(BamBam_BamCollator * collator)
 		if ( collator->tmpdirstate == BAMBAM_TMPDIR_CREATED )
 			rmdir(collator->tempdirname);
 
-		#if !defined(BAMBAMC_BAMONLY)
-		if ( collator->alignment )
-			bam_destroy1(collator->alignment);
-		#endif
-
-		#if defined(BAMBAMC_BAMONLY)
 		if ( collator->decoder )
 			BamBam_SamBamFileDecoder_Delete(collator->decoder);
-		#else
-		if ( collator->bamfile )
-			samclose(collator->bamfile);
-		#endif
+
 		BamBam_BamCollationOutputVector_Delete(collator->outputvector);
 		BamBam_BamCollationTempFileGenerator_Delete(collator->gen);
 		BamBam_BamCollationVector_Delete(collator->vector);
@@ -659,7 +626,6 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 	if ( ! collator->outputvector )
 		return BamBam_BamCollator_Delete(collator);
 
-	#if defined(BAMBAMC_BAMONLY)
 	collator->decoder = BamBam_SamBamFileDecoder_New(inputfilename,mode);
 	
 	if ( ! collator->decoder )
@@ -669,27 +635,6 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 	
 	if ( ! collator->bamheadertext )
 		return BamBam_BamCollator_Delete(collator);
-		
-	#else
-	collator->bamfile = samopen(inputfilename,mode,0);
-	
-	if ( ! collator->bamfile )
-		return BamBam_BamCollator_Delete(collator);
-
-	if ( ! collator->bamfile->header )
-		return BamBam_BamCollator_Delete(collator);
-	
-	if ( ! collator->bamfile->header->l_text )
-		collator->bamfile->header->l_text = strlen(collator->bamfile->header->text);
-	
-	collator->bamheadertext = malloc(collator->bamfile->header->l_text+1);
-		
-	if ( ! collator->bamheadertext )
-		return BamBam_BamCollator_Delete(collator);
-		
-	memset(collator->bamheadertext,0,collator->bamfile->header->l_text+1);
-	memcpy(collator->bamheadertext,collator->bamfile->header->text,collator->bamfile->header->l_text);
-	#endif
 
 	collator->filteredbamheadertext = BamBam_filterHeader(collator->bamheadertext,&hfilters[0]);
 
@@ -863,10 +808,7 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 	
 	if ( ! collator->headerinfo )
 		return BamBam_BamCollator_Delete(collator);
-
-
 		
-	#if defined(BAMBAMC_BAMONLY)
 	for ( i = 0; i < collator->decoder->header->n_ref; ++i )
 	{
 		if ( BamBam_BamHeaderInfo_AddChromosome(collator->headerinfo,
@@ -875,25 +817,9 @@ BamBam_BamCollator * BamBam_BamCollator_New(
 			return BamBam_BamCollator_Delete(collator);
 		
 	}
-	#else
-	for ( i = 0; i < collator->bamfile->header->n_targets; ++i )
-	{
-		if ( BamBam_BamHeaderInfo_AddChromosome(collator->headerinfo,
-			collator->bamfile->header->target_name[i],collator->bamfile->header->target_len[i]) 
-		)
-			return BamBam_BamCollator_Delete(collator);
-	}
-	#endif
 
 	if ( BamBam_BamHeaderInfo_ProduceHeaderText(collator->headerinfo) < 0 )
 		return BamBam_BamCollator_Delete(collator);
-
-	#if ! defined(BAMBAMC_BAMONLY)
-	collator->alignment = bam_init1();
-	
-	if ( ! collator->alignment )
-		return BamBam_BamCollator_Delete(collator);
-	#endif
 		
 	return collator;
 }

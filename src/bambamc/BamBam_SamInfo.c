@@ -80,7 +80,7 @@ static int BamBam_SamInfo_parseStringField(BamBam_SamInfo_cptrpair field, char *
 {
 	unsigned int const fieldlen = field[1]-field[0];
 	
-	// undefined by default
+	/* undefined by default */
 	*defined = bambamc_sam_field_undefined;
 	
 	if ( fieldlen > *maxlen )

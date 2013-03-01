@@ -32,15 +32,6 @@
 
 #include <bambamc/BamBam_Config.h>
 
-#if ! defined(BAMBAMC_BAMONLY)
-#if defined(HAVE_SAM_H)
-#include <sam.h>
-#endif
-#if defined(HAVE_SAMTOOLS_SAM_H)
-#include <samtools/sam.h>
-#endif
-#endif
-
 typedef struct _BamBam_BamCollator
 {
 	int state;
@@ -52,11 +43,7 @@ typedef struct _BamBam_BamCollator
 	BamBam_BamCollationTempFileGenerator * gen;
 	BamBam_BamCollationOutputVector * outputvector;
 
-	#if defined(BAMBAMC_BAMONLY)
 	BamBam_SamBamFileDecoder * decoder;
-	#else
-	samfile_t * bamfile;
-	#endif
 	
 	/* header text */
 	char * bamheadertext;
@@ -67,18 +54,10 @@ typedef struct _BamBam_BamCollator
 	BamBam_BamHeaderInfo * parsedheaderinfo;
 	BamBam_BamHeaderInfo * headerinfo;
 
-	#if defined(BAMBAMC_BAMONLY)
 	BamBam_BamSingleAlignment * alignment;
-	#else	
-	bam1_t * alignment;
-	#endif
 	
 	uint64_t nummergefiles;
-	#if defined(BAMBAMC_BAMONLY)
 	BamBam_GzipFileDecoder ** mergefiles;
-	#else
-	samfile_t ** mergefiles;
-	#endif
 	BamBam_MergeHeapEntry * mergeheap;
 	uint64_t mergeheapfill;
 	
@@ -98,7 +77,7 @@ extern void BamBam_BamCollator_MergeHeapPrint(BamBam_BamCollator * collator);
 extern void BamBam_BamCollator_MergeHeapCheck(BamBam_BamCollator * collator);
 extern BamBam_MergeHeapEntry * BamBam_BamCollator_MergeHeapMinimum(BamBam_BamCollator * collator) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern void BamBam_BamCollator_MergeHeapDeleteMinimum(BamBam_BamCollator * collator);
-extern void BamBam_BamCollator_MergeHeapInsert(BamBam_BamCollator * collator, BamBam_BamCollationHashEntry * hashentry, uint64_t fileid);
+extern void BamBam_BamCollator_MergeHeapInsert(BamBam_BamCollator * collator, BamBam_BamCollationHashEntry * hashentry, unsigned int fileid);
 extern BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator * collator) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern BamBam_BamCollator * BamBam_BamCollator_Delete(BamBam_BamCollator * collator);
 extern BamBam_BamCollator * BamBam_BamCollator_New(

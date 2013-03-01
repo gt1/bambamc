@@ -1,3 +1,9 @@
+bambamc (0.0.34-1) lucid; urgency=low
+
+  * removed support for libbam based input/output 
+
+ -- German Tischler <gt1@sanger.ac.uk>  Fri, 01 Mar 2013 14:07:15 +0000
+
 bambamc (0.0.33-1) UNRELEASED; urgency=low
 
   * added support for reading/writing bam and reading sam without libbam

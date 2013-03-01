@@ -64,68 +64,68 @@ static int BamBam_BgzfCompressor_FlushInternal(BamBam_BgzfCompressor * object, i
 
 		zret = deflate(&strm,Z_FINISH);
 		
-		// everything compressed, write block to file
+		/* everything compressed, write block to file */
 		if ( zret == Z_STREAM_END )
 		{
-			// size of compressed data
+			/* size of compressed data */
 			uint32_t const payloadsize = (BAMBAMC_LZ_MAXBUFSIZE - (BAMBAMC_LZ_HEADERSIZE+BAMBAMC_LZ_FOOTERSIZE)) - strm.avail_out;
-			// blocksize stored in extended header
+			/* blocksize stored in extended header */
 			uint16_t const headblocksize = sizeof(BamBam_GzipHeaderData)/*header*/+8/*footer*/+payloadsize-1;
-			// remaining uncompressed bytes
+			/* remaining uncompressed bytes */
 			uint32_t const rembytes = object->inbufferfill - insize;
-			// pointer to uncompressed rest
+			/* pointer to uncompressed rest */
 			Bytef const * remp = object->inbuffer + insize;
-			// empty crc
+			/* empty crc */
 			uint32_t crc = crc32(0,0,0);
-			// nextout ptr
+			/* nextout ptr */
 			Bytef * nextout = strm.next_out;
-			// total size of compressed block
+			/* total size of compressed block */
 			int32_t compsize = -1;
 
 			deflateEnd(&strm);
 			
-			// copy header into its place
+			/* copy header into its place */
 			memcpy(object->outbuffer,BamBam_GzipHeaderData,sizeof(BamBam_GzipHeaderData));
 			
-			// put block size (2 byte little endian)
+			/* put block size (2 byte little endian) */
 			object->outbuffer[16] = (headblocksize >> 0) & 0xFFu;
 			object->outbuffer[17] = (headblocksize >> 8) & 0xFFu;
 
-			// compute crc
+			/* compute crc */
 			crc = crc32(crc, object->inbuffer, insize);
 
-			// put crc
+			/* put crc */
 			*(nextout++) = (crc >>  0) & 0xFFu;
 			*(nextout++) = (crc >>  8) & 0xFFu;
 			*(nextout++) = (crc >> 16) & 0xFFu;
 			*(nextout++) = (crc >> 24) & 0xFFu;
 			
-			// put uncompressed size
+			/* put uncompressed size */
 			*(nextout++) = (insize >>  0) & 0xFFu;
 			*(nextout++) = (insize >>  8) & 0xFFu;
 			*(nextout++) = (insize >> 16) & 0xFFu;
 			*(nextout++) = (insize >> 24) & 0xFFu;
 
-			// write block
+			/* write block */
 			compsize = nextout-object->outbuffer;
 			if ( fwrite(object->outbuffer,compsize,1,object->file) != 1 )
 				return -1;
 			
-			// move uncompressed rest (if any) to start of buffer
+			/* move uncompressed rest (if any) to start of buffer */
 			if ( rembytes )
 				memmove(object->inbuffer,remp,rembytes);
 			object->inbufferfill = rembytes;
 			
 			return compsize;
 		}
-		// output buffer too small for compressed stream, reduce size of input (and try again)
+		/* output buffer too small for compressed stream, reduce size of input (and try again) */
 		else if ( zret == Z_OK )
 		{
 			fprintf(stderr,"Bad compression, reducing.\n");
 			deflateEnd(&strm);
 			insize -= ((insize >= 1024) ? 1024 : insize);
 		}
-		// other zlib error, give up
+		/* other zlib error, give up */
 		else
 		{
 			deflateEnd(&strm);
@@ -152,19 +152,19 @@ int BamBam_BgzfCompressor_Flush(BamBam_BgzfCompressor * object)
 int BamBam_BgzfCompressor_Terminate(BamBam_BgzfCompressor * object)
 {
 	int r = -1;
-	// flush
+	/* flush */
 	r = BamBam_BgzfCompressor_Flush(object);
 	
 	if ( r < 0 )
 		return -1;
 	
-	// write empty block, default compression (EOF block)
+	/* write empty block, default compression (EOF block) */
 	r = BamBam_BgzfCompressor_FlushInternal(object,Z_DEFAULT_COMPRESSION);
 	
 	if ( r < 0 )
 		return -1;
 	
-	// flush the underlying file/stream
+	/* flush the underlying file/stream */
 	if ( fflush(object->file) != 0 )
 		return -1;
 		
@@ -173,13 +173,13 @@ int BamBam_BgzfCompressor_Terminate(BamBam_BgzfCompressor * object)
 
 int BamBam_BgzfCompressor_Write(BamBam_BgzfCompressor * object, uint8_t const * data, uint32_t len)
 {
-	// loop until all data is in buffer
+	/* loop until all data is in buffer */
 	while ( len )
 	{
 		uint32_t const space = BAMBAMC_LZ_MAXBUFSIZE - object->inbufferfill;
 		uint32_t const towrite = (len <= space) ? len : space;
 		
-		// if there is no space, then try to flush out some data
+		/* if there is no space, then try to flush out some data */
 		if ( ! space )
 		{
 			int const r = BamBam_BgzfCompressor_FlushInternal(object,object->level);
@@ -189,9 +189,9 @@ int BamBam_BgzfCompressor_Write(BamBam_BgzfCompressor * object, uint8_t const * 
 		else
 		{
 			assert ( towrite );
-			// copy data
+			/* copy data */
 			memcpy(object->inbuffer+object->inbufferfill,data,towrite);
-			// update counters
+			/* update counters */
 			object->inbufferfill += towrite;
 			data += towrite;
 			len -= towrite;
@@ -301,13 +301,13 @@ int BamBam_BgzfCompressor_PutLenStringZ(BamBam_BgzfCompressor * object, char con
 	uint32_t const len = strlen(c);
 	int r = -1;
 	
-	// put length
+	/* put length */
 	r = BamBam_BgzfCompressor_PutInt32(object,len+1);
 	
 	if ( r < 0 )
 		return -1;
 	
-	// put string
+	/* put string */
 	r = BamBam_BgzfCompressor_PutStringZ(object,c);
 	
 	if ( r < 0 )

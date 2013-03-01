@@ -33,14 +33,14 @@ libbambamc_include_HEADERS= \
 	bambamc/BamBam_BgzfCompressor.h bambamc/BamBam_LineBuffer.h \
 	bambamc/BamBam_SamInfo.h	bambamc/BamBam_SamFileDecoder.h \
 	bambamc/BamBam_SamBamFileDecoder.h
-libbambamc_la_CPPFLAGS=${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
-libbambamc_la_LDFLAGS=${SAMTOOLSLDFLAGS} ${ZLIBLDFLAGS} @BAMBAMCSTATIC@ -version-info ${LIBRARY_VERSION}
-libbambamc_la_LIBADD=${SAMTOOLSLIBS} ${ZLIBLIBS}
+libbambamc_la_CPPFLAGS=${AM_CPPFLAGS}
+libbambamc_la_LDFLAGS=${ZLIBLDFLAGS} -version-info ${LIBRARY_VERSION}
+libbambamc_la_LIBADD=${ZLIBLIBS}
 
 bamreadertest_SOURCES = test/bamreadertest.c
-bamreadertest_CPPFLAGS = ${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
-bamreadertest_LDADD = libbambamc.la ${SAMTOOLSLDFLAGS} ${SAMTOOLSLIBS} ${ZLIBLIBS}
+bamreadertest_CPPFLAGS = ${AM_CPPFLAGS}
+bamreadertest_LDADD = libbambamc.la ${ZLIBLIBS}
 
 bamwritertest_SOURCES = test/bamwritertest.c
-bamwritertest_CPPFLAGS = ${SAMTOOLSCPPFLAGS} ${AM_CPPFLAGS}
-bamwritertest_LDADD = libbambamc.la ${SAMTOOLSLDFLAGS} ${SAMTOOLSLIBS} ${ZLIBLIBS}
+bamwritertest_CPPFLAGS = ${AM_CPPFLAGS}
+bamwritertest_LDADD = libbambamc.la ${ZLIBLIBS}

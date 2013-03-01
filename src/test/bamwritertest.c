@@ -79,58 +79,8 @@ int testLibBamFree(FILE * file)
 	return 0;
 }
 
-#if ! defined(BAMBAMC_BAMONLY)
-int testLibBamBased()
-{
-	BamBam_BamHeaderInfo * hi = 0;
-	BamBam_BamWriter * wr = 0;
-	int r = -1;
-
-	hi = BamBam_BamHeaderInfo_New("1.4","unknown",0);
-	assert ( hi );
-	r = BamBam_BamHeaderInfo_AddChromosome(hi, "chr1",10000);
-	assert ( ! r );
-
-	wr = BamBam_BamWriter_New(hi,"-",1);
-	assert ( wr );
-
-	r = BamBam_CharBuffer_PutAlignment(
-		wr->aput,
-		0,
-		0,
-		5000,
-		-1,
-		0,
-		"readname",
-		"ACGTTGCA",
-		"HHHHHHHH",
-		"8M",
-		60,
-		100);		
-	assert ( ! r );
-	int val = 61;
-	r = BamBam_CharBuffer_PutAuxNumber(wr->aput,"AS",'i',&val);
-	assert ( ! r );
-	int val2 = 5;
-	r = BamBam_CharBuffer_PutAuxNumber(wr->aput,"NM",'i',&val2);
-	assert ( ! r );
-
-	bam_write1(wr->outfile,wr->aput->alignment);
-	
-	BamBam_BamWriter_Delete(wr);
-	BamBam_BamHeaderInfo_Delete(hi);
-	
-	return 0;
-}
-#endif
-
 int main()
 {
-	#if defined(BAMBAMC_BAMONLY)
 	return testLibBamFree(stdout);
-	#else
-	return testLibBamBased();
-	#endif
-
 	return 0;
 }

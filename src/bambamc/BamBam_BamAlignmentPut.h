@@ -27,22 +27,10 @@
 
 #include <bambamc/BamBam_Config.h>
 
-#if ! defined(BAMBAMC_BAMONLY)
-#if defined(HAVE_SAM_H)
-#include <sam.h>
-#endif
-#if defined(HAVE_SAMTOOLS_SAM_H)
-#include <samtools/sam.h>
-#endif
-#endif
-
 typedef struct _BamBam_AlignmentPut
 {
 	BamBam_CharBuffer * charbuffer;
 	BamBam_BamSingleAlignment * calignment;
-	#if ! defined(BAMBAMC_BAMONLY)
-	bam1_t * alignment;
-	#endif
 } BamBam_AlignmentPut;
 
 extern BamBam_AlignmentPut * BamBam_AlignmentPut_New() BAMBAM_WARN_IF_UNUSEDRESULT;
@@ -74,33 +62,4 @@ extern int BamBam_CharBuffer_PutAlignmentC(
 	int32_t const isize
 	) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern int BamBam_CharBuffer_PutAuxNumberC(BamBam_AlignmentPut * aput, char const * tag, char const type, void const * rvalue) BAMBAM_WARN_IF_UNUSEDRESULT;
-
-#if ! defined(BAMBAMC_BAMONLY)
-extern int BamBam_CharBuffer_PutAlignment(
-	BamBam_AlignmentPut * aput,
-	/* flags */
-	int32_t const flags,
-	/* target (chromosome) id */
-	int32_t const tid,
-	/* position on chromosome (0 based) */
-	uint64_t const rpos,
-	/* mate target id */
-	int32_t const mtid,
-	/* position of mate on mate target id */
-	uint64_t const rmpos,
-	/* sequence name */
-	char const * name,
-	/* query sequence (read) */
-	char const * query,
-	/* quality string */
-	char const * qual,
-	/* cigar operations */
-	char const * cigar,
-	/* mapping quality */
-	int32_t const rqual,
-	/* insert size */
-	int32_t const isize
-	) BAMBAM_WARN_IF_UNUSEDRESULT;
-extern int BamBam_CharBuffer_PutAuxNumber(BamBam_AlignmentPut * aput, char const * tag, char const type, void const * rvalue) BAMBAM_WARN_IF_UNUSEDRESULT;
-#endif
 #endif

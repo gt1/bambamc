@@ -206,11 +206,7 @@ int BamBam_ReadPair(int const id, BamBam_FastQRead * const reada, BamBam_FastQRe
 
 		if ( aligna && *aligna )
 		{
-			#if defined(BAMBAMC_BAMONLY)
 			int const lena = BamBam_PutAlignmentFastQBuffer(*aligna,&(collator->bufferA),&(collator->bufferALength),term);
-			#else
-			int const lena = BamBam_PutAlignmentBuffer(*aligna,&(collator->bufferA),&(collator->bufferALength),term);
-			#endif
 			
 			if ( lena < 0 )
 				ret = BAMBAM_ALIGNMENT_TYPE_NONE;
@@ -219,11 +215,7 @@ int BamBam_ReadPair(int const id, BamBam_FastQRead * const reada, BamBam_FastQRe
 		}
 		if ( alignb && *alignb )
 		{
-			#if defined(BAMBAMC_BAMONLY)
 			int const lenb = BamBam_PutAlignmentFastQBuffer(*alignb,&(collator->bufferB),&(collator->bufferBLength),term);			
-			#else
-			int const lenb = BamBam_PutAlignmentBuffer(*alignb,&(collator->bufferB),&(collator->bufferBLength),term);
-			#endif
 			
 			if ( lenb < 0 )
 				ret = BAMBAM_ALIGNMENT_TYPE_NONE;

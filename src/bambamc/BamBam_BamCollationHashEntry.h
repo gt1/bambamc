@@ -27,22 +27,9 @@
 
 #include <bambamc/BamBam_Config.h>
 
-#if !defined(BAMBAMC_BAMONLY)
-#if defined(HAVE_SAM_H)
-#include <sam.h>
-#endif
-#if defined(HAVE_SAMTOOLS_SAM_H)
-#include <samtools/sam.h>
-#endif
-#endif
-
 typedef struct _BamBam_BamCollationHashEntry
 {
-	#if defined(BAMBAMC_BAMONLY)
 	BamBam_BamSingleAlignment * entry;
-	#else
-	bam1_t * entry;
-	#endif
 	char * qname;
 	unsigned int qnamelen;
 	uint32_t hashvalue;
@@ -53,10 +40,5 @@ extern int BamBam_BamHashEntry_CompareVerbose(BamBam_BamCollationHashEntry const
 extern int BamBam_BamHashEntry_CompareVoidPtr(const void * VA, const void * VB) BAMBAM_WARN_IF_UNUSEDRESULT;
 extern void BamBam_BamCollationHashEntry_Delete(BamBam_BamCollationHashEntry * hashentry);
 extern uint32_t BamBam_BamCollationHashEntry_GetFlags(BamBam_BamCollationHashEntry const * hashentry) BAMBAM_WARN_IF_UNUSEDRESULT;
-#if defined(BAMBAMC_BAMONLY)
 extern BamBam_BamCollationHashEntry * BamBam_BamCollationHashEntry_NewDup(BamBam_BamSingleAlignment * alignment) BAMBAM_WARN_IF_UNUSEDRESULT;
-#else
-extern BamBam_BamCollationHashEntry * BamBam_BamCollationHashEntry_NewDup(bam1_t * alignment) BAMBAM_WARN_IF_UNUSEDRESULT;
-#endif
-
 #endif

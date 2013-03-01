@@ -42,7 +42,7 @@ BamBam_BamSingleAlignment * BamBam_SamFileDecoder_LoadAlignment(BamBam_SamFileDe
 		object->fields[col][0] = pc;
 		object->fields[col][1] = p;
 		
-		// skip over tab
+		/* skip over tab */
 		if ( p != pe )
 			++p;
 		col += 1;

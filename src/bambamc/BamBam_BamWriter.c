@@ -29,18 +29,6 @@ BamBam_BamWriter * BamBam_BamWriter_Delete(BamBam_BamWriter * writer)
 	{
 		BamBam_AlignmentPut_Delete(writer->aput);
 		writer->aput = 0;
-
-		#if defined(BAMBAMC_BAMONLY)
-		#else
-		if ( writer->outfile )
-		{
-			bam_close(writer->outfile);
-			writer->outfile = 0;
-		}
-
-		BamBam_BamHeader_Delete(writer->header);
-		free(writer);
-		#endif
 	}
 	
 	return 0;
@@ -71,21 +59,6 @@ BamBam_BamWriter * BamBam_BamWriter_New(
 
 	if ( headerok < 0 )
 		return BamBam_BamWriter_Delete(writer);
-	
-	#if defined(BAMBAMC_BAMONLY)
-	#else
-	writer->header = BamBam_BamHeader_New(info);
-	
-	if ( ! writer->header )
-		return BamBam_BamWriter_Delete(writer);
-
-	if ( !strcmp(filename,"-") )
-		writer->outfile = bam_dopen(STDOUT_FILENO, &mode[0]);
-	else
-		writer->outfile = bam_open(filename, &mode[0]);
-
-	bam_header_write(writer->outfile,writer->header->header);
-	#endif
 
 	writer->aput = BamBam_AlignmentPut_New();
 

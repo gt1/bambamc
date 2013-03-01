@@ -41,7 +41,7 @@ enum bambamc_gzipheader_flags {
 #define BAMBAMC_LZ_ID1 0x1F
 #define BAMBAMC_LZ_ID2 0x8B
 /* compression method */
-#define BAMBAMC_LZ_CM 8 // compression method: deflate
+#define BAMBAMC_LZ_CM 8 /* compression method: deflate */
 /* unknown operation system id */
 #define BAMBAMC_LZ_OS_UNKNOWN 255
 /* maximum buffer size */

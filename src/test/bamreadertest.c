@@ -48,15 +48,10 @@ int runCollationTest()
 		{
 			assert ( entryA );
 			assert ( entryB );
-			// fprintf(stdout,"%s\t%s\n", entryA->qname, entryB->qname);
+			/* fprintf(stdout,"%s\t%s\n", entryA->qname, entryB->qname); */
 
-			#if defined(BAMBAMC_BAMONLY)
 			aok = BamBam_PutAlignmentFastQBuffer(entryA->entry,&bufferA,&bufferAlen,'\n');
 			bok = BamBam_PutAlignmentFastQBuffer(entryB->entry,&bufferB,&bufferBlen,'\n');
-			#else
-			aok = BamBam_PutAlignmentBuffer(entryA->entry,&bufferA,&bufferAlen,'\n');
-			bok = BamBam_PutAlignmentBuffer(entryB->entry,&bufferB,&bufferBlen,'\n');
-			#endif
 			
 			if ( aok >= 0 && bok >= 0 )
 			{
@@ -75,68 +70,6 @@ int runCollationTest()
 	
 	return 0;
 }
-
-
-#if ! defined(BAMBAMC_BAMONLY)
-int runBamToFastQTest(int argc, char * argv[])
-{
-	if ( 1 >= argc )
-	{
-		fprintf(stderr,"usage: %s <bamfile>\n", argv[0]);
-		return EXIT_FAILURE;
-	}
-	
-	char const * inputfilename = argv[1];
-
-	// char const * inputfilename = "/popper/scratch01/assembly/gt1/bamtofastqtest/KB1illumChr1.bam";
-	// char const * inputfilename = "/lustre/scratch110/sanger/gt1/bambam/dup35/8940_3.bam";
-	BamBam_BamFileDecoder * decoder = 0;
-	BamBam_BamSingleAlignment * algn = 0;
-	samfile_t * bamfile = 0;
-	bam_header_t * bamheader = 0;
-	char * buffer = 0;
-	unsigned int bufferlen = 0;
-	                
-	bamfile = samopen(inputfilename,"rb",0);
-	
-	if ( ! bamfile )
-	{
-		return EXIT_FAILURE;
-	}
-	
-	bamheader = bamfile->header;
-
-	if ( ! bamheader )
-	{
-		return EXIT_FAILURE;
-	}
-	
-	decoder = BamBam_BamFileDecoder_New(inputfilename);
-
-	if ( ! decoder )
-	{
-		samclose(bamfile);
-		return EXIT_FAILURE;
-	}
-
-	while ( (algn =  BamBam_BamFileDecoder_DecodeAlignment(decoder)) )
-	{
-	
-		int const ok = BamBam_PutAlignmentFastQBuffer(algn, &buffer, &bufferlen, '\n');
-
-		if ( ok < 0 )
-			break;
-		
-		fwrite(buffer,ok,1,stdout);
-	}
-	
-	BamBam_BamFileDecoder_Delete(decoder);
-	samclose(bamfile);
-	
-	return EXIT_SUCCESS;
-}
-#endif
-
 
 void lineBufferTest()
 {
@@ -191,8 +124,7 @@ void samBamSamTest()
 int main(int argc, char * argv[])
 {
 	runCollationTest();	
-	// lineBufferTest();
-	
-	
+	/* lineBufferTest(); */
+		
 	return EXIT_SUCCESS;
 }

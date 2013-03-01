@@ -86,23 +86,23 @@ int BamBam_LineBuffer_GetLine(BamBam_LineBuffer * object, char const **a, char c
 {
 	while ( 1 )
 	{
-		// end of line pointer
+		/* end of line pointer */
 		char * lineend = object->bufferptrout;
 
-		// search for end of buffer or line end
+		/* search for end of buffer or line end */
 		while ( lineend != object->bufferptrin && *(lineend) != '\n' )
 			++lineend;
 		
-		// we reached the end of the data currently in memory
+		/* we reached the end of the data currently in memory */
 		if ( lineend == object->bufferptrin )
 		{
-			// reached end of file, return what we have
+			/* reached end of file, return what we have */
 			if ( object->eof )
 			{
-				// this is the last line we will return
+				/* this is the last line we will return */
 				if ( object->bufferptrout != object->bufferptrin )
 				{
-					// if file ends with a newline
+					/* if file ends with a newline */
 					if ( object->bufferptrin[-1] == '\n' )
 					{
 						*a = object->bufferptrout;
@@ -110,7 +110,7 @@ int BamBam_LineBuffer_GetLine(BamBam_LineBuffer * object, char const **a, char c
 						object->bufferptrout = object->bufferptrin;
 						return 0;
 					}
-					// otherwise we append an artifical newline
+					/* otherwise we append an artifical newline */
 					else
 					{
 						uint64_t const numbytes = lineend - object->bufferptrout;
@@ -141,10 +141,10 @@ int BamBam_LineBuffer_GetLine(BamBam_LineBuffer * object, char const **a, char c
 					return -1;
 				}
 			}
-			// we need to read more data
+			/* we need to read more data */
 			else
 			{
-				// do we need to extend the buffer?
+				/* do we need to extend the buffer? */
 				if ( 
 					object->bufferptrout == object->bufferptra
 					&&
@@ -156,7 +156,7 @@ int BamBam_LineBuffer_GetLine(BamBam_LineBuffer * object, char const **a, char c
 
 					if ( newbuf )
 					{
-						// fprintf(stderr,"extended buffer to %d bytes\n", newbufsize);
+						/* fprintf(stderr,"extended buffer to %d bytes\n", newbufsize); */
 						object->bufferptre   = newbuf + newbufsize;
 						object->bufferptrout = newbuf + (object->bufferptrout - object->bufferptra);
 						object->bufferptrin  = newbuf + (object->bufferptrin - object->bufferptra);
@@ -171,7 +171,7 @@ int BamBam_LineBuffer_GetLine(BamBam_LineBuffer * object, char const **a, char c
 				}
 				else
 				{
-					// move data to front and fill rest of buffer
+					/* move data to front and fill rest of buffer */
 					uint64_t const used   = object->bufferptrin  - object->bufferptrout;
 					uint64_t const unused = object->bufsize - used;
 					size_t iobytes = 0;
@@ -188,7 +188,7 @@ int BamBam_LineBuffer_GetLine(BamBam_LineBuffer * object, char const **a, char c
 					if ( feof(object->file) )
 						object->eof = 1;
 						
-					// fprintf(stderr,"Got %d bytes\n", iobytes);
+					/* fprintf(stderr,"Got %d bytes\n", iobytes); */
 					
 					object->bufferptrin += iobytes;
 				}

@@ -26,17 +26,4 @@
 #include <stdint.h>
 
 extern int BamBam_PutAlignmentFastQBuffer(BamBam_BamSingleAlignment * alignment,  char ** buffer,  unsigned int * bufferlen,  char const term);
-
-#if defined(BAMBAMC_BAMONLY)
-#else
-#if defined(HAVE_SAM_H)
-#include <sam.h>
-#endif
-#if defined(HAVE_SAMTOOLS_SAM_H)
-#include <samtools/sam.h>
-#endif
-
-extern int BamBam_PutAlignmentBuffer(bam1_t const * alignment, char ** buffer, unsigned int * bufferlen, char const term) BAMBAM_WARN_IF_UNUSEDRESULT;
-#endif
-
 #endif

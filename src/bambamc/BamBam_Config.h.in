@@ -19,7 +19,4 @@
 #if ! defined(BAMBAMC_CONFIG_H)
 #define BAMBAMC_CONFIG_H
 
-@SAMHEADERDEFINE@
-@BAMONLYDEFINE@
-
 #endif

@@ -19,6 +19,7 @@
 
 #include <bambamc/BamBam_FormatNumber.h>
 #include <stdio.h>
+#include <alloca.h>
 
 char * BamBam_ConstructNumberFormatString(int numlen)
 {

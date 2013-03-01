@@ -20,21 +20,11 @@
 #if ! defined(BAMBAM_BAMWRITER_H)
 #define BAMBAM_BAMWRITER_H
 
-#if ! defined(BAMBAMC_BAMONLY)
-#include <bambamc/BamBam_BamHeader.h>
-#endif
-
 #include <bambamc/BamBam_BamAlignmentPut.h>
 #include <bambamc/BamBam_BamHeaderInfo.h>
 
 typedef struct _BamBam_BamWriter
 {
-	#if defined(BAMBAMC_BAMONLY)
-	
-	#else
-	BamBam_BamHeader * header;
-	bamFile outfile;	
-	#endif
 	BamBam_AlignmentPut * aput;
 } BamBam_BamWriter;
 

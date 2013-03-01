@@ -443,7 +443,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_SAM(FILE * reader)
 				return BamBam_BamFileHeader_Delete(header);	
 			}
 
-			// fprintf(stderr,"Seq %s %d\n", sn,ln);			
+			/* fprintf(stderr,"Seq %s %d\n", sn,ln); */
 			
 			chr = BamBam_Chromosome_New(sn,ln);
 
@@ -810,7 +810,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 	/* copy rest of the lines without SQ and HD lines */
 	for ( hc = header->headerlines; *hc; ++hc )
 	{
-		// fprintf(stderr, "Checking %s\n", *hc);
+		/* fprintf(stderr, "Checking %s\n", *hc); */
 	
 		if ( 
 			strlen(*hc) >= 4 
@@ -838,7 +838,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 		{
 			char const * line = *hc;
 			
-			// fprintf(stderr,"Here: %s\n", line);
+			/* fprintf(stderr,"Here: %s\n", line); */
 			
 			while ( *line )
 			{
@@ -848,7 +848,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 				while ( (*fielde) && (*fielde != '\t') )
 					++fielde;
 					
-				// fprintf(stderr, "field length %d\n", (fielde-field));
+				/* fprintf(stderr, "field length %d\n", (fielde-field)); */
 
 				if ( fielde-field >= 3 && field[0] == 'S' && field[1] == 'N' && field[2] == ':' )
 				{
@@ -919,7 +919,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 	for ( i = 0; i < (unsigned int)(header->n_ref); ++i )
 		if ( ! header->chromosomevec[i]->headerline )
 		{
-			// fprintf(stderr,"Sequence %s is in binary header but not in text\n", header->chromosomevec[i]->name);
+			/* fprintf(stderr,"Sequence %s is in binary header but not in text\n", header->chromosomevec[i]->name); */
 			
 			BamBam_Chromosome const * chr = header->chromosomevec[i];
 			int r = 0;
@@ -957,7 +957,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 			}
 		}
 	
-	// push terminator symbol	
+	/* push terminator symbol */
 	if ( BamBam_CharBuffer_PushChar(htextbuf,0) < 0 )
 	{
 		BamBam_CharBuffer_Delete(htextbuf);
@@ -974,7 +974,7 @@ BamBam_BamFileHeader * BamBam_BamFileHeader_New_BAM(BamBam_GzipReader * reader)
 	
 	BamBam_CharBuffer_Delete(htextbuf);
 	
-	// fprintf(stderr,"%s",header->headertext);
+	/* fprintf(stderr,"%s",header->headertext); */
 			
 	return header;
 }
