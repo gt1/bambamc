@@ -6,7 +6,7 @@ THIRD=`echo $VERSION | awk -F'.' '{print $3}'`
 NEXTTHIRD=`expr ${THIRD} + 1`
 
 awk -v first=${FIRST} -v second=${SECOND} -v third=${THIRD} '/^AC_INIT/ {gsub(first"."second"."third,first"."second"."third+1);print} ; !/^AC_INIT/{print}' < configure.in | \
-	awk -v first=${FIRST} -v second=${SECOND} -v third=${THIRD} '/^LIBRARY_VERSION=/ {gsub("="first"."third"."second,"="first":"third+1"."second);print} ; !/^LIBRARY_VERSION=/{print}' \
+	awk -v first=${FIRST} -v second=${SECOND} -v third=${THIRD} '/^LIBRARY_VERSION=/ {gsub("="first"."third"."second,"="first":"third+1":"second);print} ; !/^LIBRARY_VERSION=/{print}' \
 	> configure.in.tmp
 mv configure.in.tmp configure.in
 
