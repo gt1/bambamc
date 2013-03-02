@@ -7,5 +7,5 @@ Name: bambamc
 Description: bambamc
 Requires: @ZLIBREQ@
 Version: @VERSION@
-Libs: -L${libdir} -lbambamc @SAMTOOLSLDFLAGS@ @SAMTOOLSLIBS@ @ZLIBPKGLIBS@
-Cflags: -I${includedir} @SAMTOOLSCPPFLAGS@
+Libs: -L${libdir} -lbambamc @ZLIBPKGLIBS@
+Cflags: -I${includedir}
