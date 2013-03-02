@@ -22,7 +22,7 @@
 enum bam_flags
 {
 	BAMBAMC_FPAIRED = (1u << 0),
-	BAMBAMC_FPROPER = (1u << 1),
+	BAMBAMC_FPROPER_PAIR = (1u << 1),
 	BAMBAMC_FUNMAP = (1u << 2),
 	BAMBAMC_FMUNMAP = (1u << 3),
 	BAMBAMC_FREVERSE = (1u << 4),
