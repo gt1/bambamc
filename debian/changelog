@@ -1,3 +1,9 @@
+bambamc (0.0.40-1) UNRELEASED; urgency=low
+
+  * fix version bumping script 
+
+ -- German Tischler <gt1@sanger.ac.uk>  Sat, 02 Mar 2013 11:58:14 +0000
+
 bambamc (0.0.39-1) UNRELEASED; urgency=low
 
   * fix pkg-config file (remove samtools/libbam references)
