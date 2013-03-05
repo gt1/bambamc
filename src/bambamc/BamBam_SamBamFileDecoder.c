@@ -56,10 +56,12 @@ static int BamBam_SamBamFileDecoder_ContainsLetter(char const * s, char const c)
 
 BamBam_SamBamFileDecoder * BamBam_SamBamFileDecoder_New(char const * filename, char const * mode)
 {
+	BamBam_SamBamFileDecoder * object = 0;
+
 	if ( ! BamBam_SamBamFileDecoder_ContainsLetter(mode,'r') )
 		return 0;
 		
-	BamBam_SamBamFileDecoder * object = (BamBam_SamBamFileDecoder *)malloc(sizeof(BamBam_SamBamFileDecoder));
+	object = (BamBam_SamBamFileDecoder *)malloc(sizeof(BamBam_SamBamFileDecoder));
 	
 	if ( ! object )
 		return BamBam_SamBamFileDecoder_Delete(object);

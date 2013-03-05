@@ -642,6 +642,7 @@ int BamBam_BamSingleAlignment_DecodeCigarRc(BamBam_BamSingleAlignment * algn, in
 	int32_t const cigstrlen = getCigarStringLength(ecigar,ncigar);
 	uint32_t i;
 	static char const * opc = "MIDNSHP=X???????";
+	char * out = 0;
 
 	if ( cigstrlen > algn->cigarspace )
 	{
@@ -654,7 +655,7 @@ int BamBam_BamSingleAlignment_DecodeCigarRc(BamBam_BamSingleAlignment * algn, in
 	}
 	algn->cigar[cigstrlen] = 0;
 	
-	char * out = algn->cigar;
+	out = algn->cigar;
 	
 	if ( ! rc )
 		for ( i = 0; i < ncigar; ++i, ecigar += 4 )

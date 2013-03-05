@@ -25,7 +25,6 @@
 #include <bambamc/BamBam_BamCollationVector.h>
 #include <bambamc/BamBam_BamCollationOutputVector.h>
 #include <bambamc/BamBam_MergeHeapEntry.h>
-#include <bambamc/BamBam_BamHeader.h>
 #include <bambamc/BamBam_BamHeaderInfo.h>
 #include <bambamc/BamBam_SamBamFileDecoder.h>
 #include <bambamc/BamBam_GzipFileDecoder.h>

@@ -18,7 +18,6 @@
 **/
 
 #include <bambamc/BamBam_BamCollationVector.h>
-#include <bambamc/BamBam_BamSingleAlignment_ToBam1.h>
 #include <bambamc/BamBam_BamFlagBase.h>
 
 BamBam_BamCollationVector * BamBam_BamCollationVector_New(unsigned int sizelog)

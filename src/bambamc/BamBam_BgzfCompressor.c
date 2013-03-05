@@ -20,10 +20,10 @@
 
 static const char BamBam_GzipHeaderData[18] =
 {
-	BAMBAMC_LZ_ID1, BAMBAMC_LZ_ID2, BAMBAMC_LZ_CM, BAMBAMC_LZ_FEXTRA,
+	(char)BAMBAMC_LZ_ID1, (char)BAMBAMC_LZ_ID2, BAMBAMC_LZ_CM, BAMBAMC_LZ_FEXTRA,
 	0,0,0,0, /* modification time, not given */
 	0, /* XFL */
-	BAMBAMC_LZ_OS_UNKNOWN,
+	(char)BAMBAMC_LZ_OS_UNKNOWN,
 	6,0, /* XLEN, number 6 as little endian */
 	'B', 'C', /* extra data block tag */
 	2,0, /* length of extra field, 2 as little endian */
