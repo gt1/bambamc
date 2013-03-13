@@ -20,7 +20,12 @@
 #include <bambamc/BamBam_CharBuffer.h>
 #include <bambamc/BamBam_BamFlagBase.h>
 #include <assert.h>
+
+#if defined(_linux)
 #include <alloca.h>
+#endif
+
+#include <stdlib.h>
 
 static uint32_t getNumLength(uint32_t num, uint32_t const base)
 {

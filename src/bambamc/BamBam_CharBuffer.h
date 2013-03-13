@@ -21,7 +21,12 @@
 #define BAMBAM_CHARBUFFER_H
 
 #include <stdint.h>
+
+#if defined(_linux)
 #include <alloca.h>
+#endif
+
+#include <stdlib.h>
 
 typedef struct _BamBam_CharBuffer
 {

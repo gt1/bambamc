@@ -20,7 +20,12 @@
 #include <bambamc/BamBam_FormatNumber.h>
 #include <bambamc/BamBam_StrDup.h>
 #include <stdio.h>
+
+#if defined(_linux)
 #include <alloca.h>
+#endif
+
+#include <stdlib.h>
 
 char * BamBam_ConstructNumberFormatString(int numlen)
 {
