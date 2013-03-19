@@ -25,6 +25,29 @@
 #include <bambamc/BamBam_BgzfCompressor.h>
 #include <string.h>
 
+typedef enum _bambamc_alignment_validity {
+	bambamc_alignment_validity_ok = 0,
+	bambamc_alignment_validity_block_too_small = 1,
+	bambamc_alignment_validity_queryname_extends_over_block = 2,
+	bambamc_alignment_validity_queryname_length_inconsistent = 3,
+	bambamc_alignment_validity_cigar_extends_over_block = 4,
+	bambamc_alignment_validity_sequence_extends_over_block = 5,
+	bambamc_alignment_validity_quality_extends_over_block = 6,
+	bambamc_alignment_validity_cigar_is_inconsistent_with_sequence_length = 7,
+	bambamc_alignment_validity_unknown_cigar_op = 8,
+	bambamc_alignment_validity_queryname_contains_illegal_symbols = 9,
+	bambamc_alignment_validity_queryname_empty = 10,
+	bambamc_alignment_validity_invalid_mapping_position = 11,
+	bambamc_alignment_validity_invalid_next_mapping_position = 12,
+	bambamc_alignment_validity_invalid_tlen = 13,
+	bambamc_alignment_validity_invalid_quality_value = 14,
+	bambamc_alignment_validity_invalid_refseq = 15,
+	bambamc_alignment_validity_invalid_next_refseq = 16,
+	bambamc_alignment_validity_invalid_auxiliary_data = 17,
+	bambamc_alignment_valididy_record_length_negative = 18
+} bambamc_alignment_validity;
+
+
 typedef struct _BamBam_BamSingleAlignment
 {
 	uint8_t * data;
@@ -39,6 +62,8 @@ typedef struct _BamBam_BamSingleAlignment
 	
 	char * cigar;
 	int32_t cigarspace;
+	
+	bambamc_alignment_validity valid;
 	
 	BamBam_CharBuffer * auxbuffer;
 }
@@ -85,4 +110,5 @@ extern int BamBam_BamSingleAlignment_DecodeAuxSingle(BamBam_BamSingleAlignment *
 extern char const * BamBam_BamSingleAlignment_DecodeAux(BamBam_BamSingleAlignment * algn);
 extern uint8_t const * BamBam_BamSingleAlignment_FindAux(BamBam_BamSingleAlignment const * algn, char const tag[2]);
 extern uint64_t BamBam_BamSingleAlignment_GetAuxLength(BamBam_BamSingleAlignment const * algn);
+extern char const * BamBam_Alignment_Validity_Str(bambamc_alignment_validity const code);
 #endif

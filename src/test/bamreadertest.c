@@ -33,7 +33,7 @@ int runCollationTest()
 	int aok, bok;
 	
 	/* allocate collator */
-	col = BamBam_BamCollator_New("tmpdir",16,16,"sam","-");
+	col = BamBam_BamCollator_New("tmpdir",16,16,"bam","-");
 	
 	if ( ! col )
 	{
@@ -108,23 +108,27 @@ void lineBufferTest()
 
 void samBamSamTest()
 {
-	BamBam_SamBamFileDecoder * samdec = BamBam_SamBamFileDecoder_New("-","r");
+	uint64_t c = 0;
+	BamBam_SamBamFileDecoder * samdec = BamBam_SamBamFileDecoder_New("-","rb");
 	BamBam_BamSingleAlignment * algn = 0;
 	assert ( samdec );
 
 	while ( (algn = BamBam_SamBamFileDecoder_DecodeAlignment(samdec)) )
 	{
 		char const * name = BamBam_BamSingleAlignment_GetReadName(algn);
-		fprintf(stderr,"%s\n", name);
+		// fprintf(stderr,"%s\n", name);
+		if ( ++c % (1024*1024) == 0 )
+			fprintf(stderr,"%d\n", (int)(c/(1024*1024)) );
 	}
-	
+		
 	BamBam_SamBamFileDecoder_Delete(samdec);
 }
 
 int main(/* int argc, char * argv[] */)
 {
-	runCollationTest();	
+	// runCollationTest();	
 	/* lineBufferTest(); */
+	samBamSamTest();
 		
 	return EXIT_SUCCESS;
 }

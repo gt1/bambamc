@@ -80,7 +80,7 @@ static int64_t getAuxLength(uint8_t const * D)
 	switch ( D[2] )
 	{
 		case 'A': case 'c': case 'C': case 's': case 'S': case 'i': case 'I': case 'f': return 2+1+getPrimLengthByType(D[2]);
-		case 'Z':
+		case 'H':
 		{
 			uint64_t len = 2+1;
 			D += len;
@@ -183,6 +183,13 @@ static int auxValueToString(uint8_t const * D, BamBam_CharBuffer * buffer)
 			
 			BamBam_CharBuffer_PushString(buffer,tmpmem,r);
 			
+			break;
+		}
+		case 'H':
+		{
+			uint8_t const * p = D+3;
+			while ( *p && (r >= 0) )
+				BamBam_CharBuffer_PushCharQuick(buffer,*(p++),r);
 			break;
 		}
 		case 'Z':
@@ -792,19 +799,57 @@ int BamBam_BamSingleAlignment_StoreAlignmentBgzf(BamBam_BamSingleAlignment const
 	return 0;
 }
 
+static uint8_t const bambamc_qnameValidTable[256] = {
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+	0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
+
 int BamBam_BamSingleAlignment_LoadAlignment(BamBam_BamSingleAlignment * data, BamBam_GzipReader * reader)
 {
-	int32_t reclen;
+	int32_t reclen = -1;
+	char const * ca = 0;
+	char const * cc = 0;
+	char const * ce = 0;
+	uint8_t const * ue = 0;
+	uint8_t const * ecigar;
+	uint32_t ncigar; 
+	uint32_t i = 0;
+	uint64_t ciglen = 0;
+	int32_t pos = 0;
+	uint64_t lseq = 0;
+	uint8_t const * quala = 0;
+	uint8_t const * qualc = 0;
+	uint8_t const * quale = 0;
+	uint8_t const * auxa = 0;
+	uint8_t const * auxc = 0;
+	uint64_t alen = 0;
 
 	if ( BamBam_GzipReader_Peek(reader) < 0 )
 	{
 		/* fprintf(stderr,"EOF.\n"); */
 		return 0;
 	}
-	
+
+	/* assume block is valid until it turns out otherwise */
+	data->valid = bambamc_alignment_validity_ok;
+
+	/* read length of alignment block */	
 	if ( BamBam_GzipReader_GetInt32(reader,&reclen) < 0 )
 		return -1;
 
+	if ( reclen < 32 )
+	{
+		data->valid = bambamc_alignment_validity_block_too_small;
+		return -1;
+	}
+		
+	/* increase size of memory block if needed */
 	if ( (int32_t)data->dataav < reclen )
 	{
 		free(data->data);
@@ -814,10 +859,324 @@ int BamBam_BamSingleAlignment_LoadAlignment(BamBam_BamSingleAlignment * data, Ba
 		data->dataav = reclen;
 	}
 	
+	/* read block */
 	if ( BamBam_GzipReader_Read(reader,(char*)data->data,reclen) != reclen )
 		return -1;
 		
 	data->dataused = reclen;
+
+	if ( reclen < 32 )
+	{
+		data->valid = bambamc_alignment_validity_block_too_small;
+		return -1;
+	}
+	
+	/* compute length of query name */
+	ca = BamBam_BamSingleAlignment_GetReadName(data);
+	cc = ca;
+	ce = ((char const *)data->data) + data->dataused;
+	ue = ((uint8_t *)data->data) + data->dataused;
+	
+	while ( cc != ce && *cc )
+	{
+		if ( ! bambamc_qnameValidTable[*cc] )
+		{
+			data->valid = bambamc_alignment_validity_queryname_contains_illegal_symbols;
+			return -1;
+		}
+		++cc;
+	}
+
+	if ( cc == ce )
+	{
+		data->valid = bambamc_alignment_validity_queryname_extends_over_block;
+		return -1;
+	}
+	
+	assert ( ! *cc );
+	
+	if ( (cc-ca)+1 != BamBam_BamSingleAlignment_GetNL(data) )
+	{
+		data->valid = bambamc_alignment_validity_queryname_length_inconsistent;
+		return -1;
+	}
+	
+	if ( cc == ca )
+	{
+		data->valid = bambamc_alignment_validity_queryname_empty;
+		return -1;
+	}
+	
+	if ( ue-BamBam_BamSingleAlignment_GetEncodedCigar(data) < BamBam_BamSingleAlignment_GetNC(data)*sizeof(uint32_t) )
+	{
+		data->valid = bambamc_alignment_validity_cigar_extends_over_block;
+		return -1;
+	}
+	
+	if ( ue-BamBam_BamSingleAlignment_GetEncodedQuery(data) <  (BamBam_BamSingleAlignment_GetLSeq(data)+1)/2 )
+	{
+		data->valid = bambamc_alignment_validity_sequence_extends_over_block;
+		return -1;
+	}
+	
+	if ( ue-BamBam_BamSingleAlignment_GetEncodedQual(data) < BamBam_BamSingleAlignment_GetLSeq(data) )
+	{
+		data->valid = bambamc_alignment_validity_quality_extends_over_block;
+		return -1;
+	}
+
+	if ( !(BamBam_BamSingleAlignment_GetFlags(data) & BAMBAMC_FUNMAP) )
+	{
+		ecigar = BamBam_BamSingleAlignment_GetEncodedCigar(data);
+		ncigar = BamBam_BamSingleAlignment_GetNC(data);
+
+		for ( i = 0; i < ncigar; ++i )
+		{
+			uint32_t const oppair = decodeUInt(ecigar + i*sizeof(uint32_t),4);
+			uint32_t len = (oppair>>4)&((1ul <<28)-1);
+			uint32_t const op = oppair & 0xF;
+			
+			if ( op > (uint32_t)BAMBAMC_CDIFF )
+			{
+				data->valid = bambamc_alignment_validity_unknown_cigar_op;
+				return -1;
+			}
+			
+			switch ( op )
+			{
+				case BAMBAMC_CMATCH:
+				case BAMBAMC_CINS:
+				case BAMBAMC_CSOFT_CLIP:
+				case BAMBAMC_CEQUAL:
+				case BAMBAMC_CDIFF:
+					ciglen += len;
+					break;
+			}	
+		}
+		
+		if ( ciglen != BamBam_BamSingleAlignment_GetLSeq(data) )
+		{
+			data->valid = bambamc_alignment_validity_cigar_is_inconsistent_with_sequence_length;
+			return -1;
+		}
+	}
+	
+	pos = BamBam_BamSingleAlignment_GetPos(data);
+	
+	if ( pos < -1 || pos > (((1ll<<29)-1)-1) )
+	{
+		data->valid = bambamc_alignment_validity_invalid_mapping_position;
+		return -1;
+	}
+	
+	pos = BamBam_BamSingleAlignment_GetNextPos(data);
+
+	if ( pos < -1 || pos > (((1ll<<29)-1)-1) )
+	{
+		data->valid = bambamc_alignment_validity_invalid_next_mapping_position;
+		return -1;
+	}
+	
+	pos = BamBam_BamSingleAlignment_GetTLen(data);
+	
+	if ( pos < ((-(1ll<<29))+1) || pos > ((1ll<<29)-1) )
+	{
+		data->valid = bambamc_alignment_validity_invalid_tlen;
+		return -1;
+	}
+
+	lseq = BamBam_BamSingleAlignment_GetLSeq(data);
+	quala = BamBam_BamSingleAlignment_GetEncodedQual(data);
+	quale = quala + lseq;
+	for ( qualc = quala; qualc != quale; ++qualc )
+		if ( (int)(*qualc) > (int)('~'-33) )
+		{
+			if ( *qualc == 255 )
+			{
+				if ( qualc - quala )
+				{
+					data->valid = bambamc_alignment_validity_invalid_quality_value;
+					return -1;
+				}
+				
+				while ( qualc != quale )
+					if ( *(qualc++) != 255 )
+					{
+						data->valid = bambamc_alignment_validity_invalid_quality_value;
+						return -1;
+					}
+				
+				/* go back by one to leave loop above */
+				--qualc;
+			}
+			else
+			{
+				data->valid = bambamc_alignment_validity_invalid_quality_value;
+				return -1;
+			}
+		}
+
+	auxa = BamBam_BamSingleAlignment_GetEncodedAux(data);
+	auxc = auxa;
+
+	while ( auxc != ue )
+	{
+		uint64_t lauxlen = 0;
+	
+		if ( (ue-auxc) < 3 )
+		{
+			data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+			return -1;
+		}
+			
+		switch ( auxc[2] )
+		{
+			case 'A':
+				if ( ue-auxc < 3+1 )
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+				if ( auxc[3] < '!' || auxc[3] > '~' )
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+				lauxlen = 3+1;
+				break;
+			case 'c':
+			case 'C':
+				if ( ue-auxc < 3+1 )
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+				lauxlen = 3+1;
+				break;
+			case 's':
+			case 'S':
+				if ( ue-auxc < 3+2 )
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+				lauxlen = 3+2;
+				break;
+			case 'i':
+			case 'I':
+			case 'f':
+				if ( ue-auxc < 3+4 )
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+				lauxlen = 3+4;
+				break;
+			case 'B':
+			{
+				if ( ue-auxc < 3+1/*data type*/+4/*array length*/ )
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+				/* length of array */
+				alen = decodeUInt(auxc+4,4);
+				/* valid element data types */
+				switch ( auxc[3] )
+				{
+					case 'c':
+					case 'C':
+						if ( (ue-auxc) < (3+1+4+ 1*alen) )
+						{
+							data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+							return -1;
+						}
+						lauxlen = 3+1+4+ 1*alen;
+						break;
+					case 's':
+					case 'S':
+						if ( (ue-auxc) < (3+1+4+ 2*alen) )
+						{
+							data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+							return -1;
+						}
+						lauxlen = 3+1+4+ 2*alen;
+						break;
+					case 'i':
+					case 'I':
+					case 'f':
+						if ( (ue-auxc) < (3+1+4+ 4*alen) )
+						{
+							data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+							return -1;
+						}
+						lauxlen = 3+1+4+ 4*alen;
+						break;
+					default:
+						{
+							data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+							return -1;
+						}
+				}
+				break;
+			}
+			case 'Z':
+			{
+				uint8_t const * p = auxc+3;
+				
+				while ( p != ue && *p )
+					++p;
+				
+				/* if terminator byte 0 is not inside block */
+				if ( p == ue )
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+				
+				assert ( ! *p );
+				
+				lauxlen = (p-auxc)+1;
+
+				break;
+			}
+			case 'H':
+			{
+				uint8_t const * p = auxc+3;
+				
+				while ( p != ue && *p )
+					++p;
+				
+				/* if terminator byte 0 is not inside block */
+				if ( p == ue )
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+
+				assert ( ! *p );
+				
+				lauxlen = (p-auxc)+1;
+
+				break;
+			}
+			default:
+				{
+					data->valid = bambamc_alignment_validity_invalid_auxiliary_data;
+					return -1;
+				}
+				break;
+		}
+
+		auxc = auxc + lauxlen;
+	}
+                                                                                                                                
+/*
+typedef enum _bambamc_alignment_validity {
+	bambamc_alignment_validity_invalid_refseq = 15,
+	bambamc_alignment_validity_invalid_next_refseq = 16,
+} bambamc_alignment_validity;
+*/
 
 	return 1;
 }
@@ -975,4 +1334,49 @@ BamBam_BamSingleAlignment * BamBam_BamSingleAlignment_Clone(BamBam_BamSingleAlig
 	}
 		
 	return data;
+}
+
+char const * BamBam_Alignment_Validity_Str(bambamc_alignment_validity const code)
+{
+	switch ( code )
+	{
+		case bambamc_alignment_validity_ok:
+			return "Alignment valid";
+		case bambamc_alignment_validity_block_too_small:
+			return "Alignment block is too small to hold fixed size data";
+		case bambamc_alignment_validity_queryname_extends_over_block:
+			return "Null terminated query name extends beyond block boundary";
+		case bambamc_alignment_validity_queryname_length_inconsistent:
+			return "Length of null terminated query name is inconsistent with alignment header";
+		case bambamc_alignment_validity_cigar_extends_over_block:
+			return "Cigar data extends beyond block boundary";
+		case bambamc_alignment_validity_sequence_extends_over_block:
+			return "Sequence data extends beyond block boundary";
+		case bambamc_alignment_validity_quality_extends_over_block:
+			return "Quality data extends beyond block boundary";
+		case bambamc_alignment_validity_cigar_is_inconsistent_with_sequence_length:
+			return "Cigar operations are inconsistent with length of query sequence";
+		case bambamc_alignment_validity_unknown_cigar_op:
+			return "Unknown/invalid cigar operator";
+		case bambamc_alignment_validity_queryname_contains_illegal_symbols:
+			return "Query name contains illegal symbols";
+		case bambamc_alignment_validity_queryname_empty:
+			return "Query name is the empty string";
+		case bambamc_alignment_validity_invalid_mapping_position:
+			return "Invalid leftmost mapping position";
+		case bambamc_alignment_validity_invalid_next_mapping_position:
+			return "Invalid next segment mapping position";
+		case bambamc_alignment_validity_invalid_tlen:
+			return "Invalid observed template length";
+		case bambamc_alignment_validity_invalid_quality_value:
+			return "Quality string contains invalid quality value";
+		case bambamc_alignment_validity_invalid_refseq:
+			return "Invalid/unknown reference sequence identifier";
+		case bambamc_alignment_validity_invalid_next_refseq:
+			return "Invalid/unknown next segment reference sequence identifier";
+		case bambamc_alignment_validity_invalid_auxiliary_data:
+			return "Invalid auxiliary tag data";
+		default:
+			return "Unknown alignment validity value.";
+	};
 }
