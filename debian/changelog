@@ -1,3 +1,9 @@
+bambamc (0.0.44-1) UNRELEASED; urgency=low
+
+  * add code for detecting broken BAM files 
+
+ -- German Tischler <gt1@sanger.ac.uk>  Tue, 19 Mar 2013 10:43:37 +0000
+
 bambamc (0.0.43-1) UNRELEASED; urgency=low
 
   * fixed compilation on FreeBSD 
