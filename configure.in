@@ -1,5 +1,5 @@
-AC_INIT(bambamc,0.0.44,[gt1@sanger.ac.uk],[bambamc],[http://www.sanger.ac.uk])
-LIBRARY_VERSION=0:44:0
+AC_INIT(bambamc,0.0.45,[gt1@sanger.ac.uk],[bambamc],[http://www.sanger.ac.uk])
+LIBRARY_VERSION=0:45:0
 AC_CANONICAL_SYSTEM
 AC_PROG_LIBTOOL
 

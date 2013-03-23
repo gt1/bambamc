@@ -1,3 +1,9 @@
+bambamc (0.0.45-1) unstable; urgency=low
+
+  * split package into runtime and dev part 
+
+ -- German Tischler <baer@german-pc>  Sat, 23 Mar 2013 22:15:00 +0000
+
 bambamc (0.0.44-1) UNRELEASED; urgency=low
 
   * add code for detecting broken BAM files 

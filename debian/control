@@ -1,11 +1,19 @@
 Source: bambamc
 Maintainer: German Tischler <gt1@sanger.ac.uk>
-Section: misc
+Section: universe/libs
 Priority: optional
 Standards-Version: 3.9.2
 Build-Depends: debhelper (>= 7),  autoconf (>= 2.61), automake (>= 1.10), libtool (>= 2.2.6), pkg-config (>= 0.22), zlib1g-dev (>= 1.2.3)
+Vcs-Git: git://github.com/gt1/bambamc.git
+Vcs-browser: https://github.com/gt1/bambamc.git
 
 Package: bambamc
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: bambamc
+Description: Runtime library for bambamc
+
+Package: bambamc-dev
+Section: universe/libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pkg-config (>= 0.22), zlib1g-dev (>= 1.2.3)
+Description: Development files for bambamc (headers, libraries and pkg-config files)
