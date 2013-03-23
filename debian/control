@@ -15,5 +15,5 @@ Description: Runtime library for bambamc
 Package: bambamc-dev
 Section: universe/libdevel
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, pkg-config (>= 0.22), zlib1g-dev (>= 1.2.3)
+Depends: ${shlibs:Depends}, ${misc:Depends}, bambamc (= ${binary:Version}), pkg-config (>= 0.22), zlib1g-dev (>= 1.2.3)
 Description: Development files for bambamc (headers, libraries and pkg-config files)
