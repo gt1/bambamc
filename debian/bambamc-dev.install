@@ -1,4 +1,5 @@
 usr/include
 usr/lib/libbambamc.so
 usr/lib/libbambamc.a
+usr/lib/*.la
 usr/lib/pkgconfig
