@@ -2,13 +2,13 @@ bambamc (0.0.46-0) unstable; urgency=low
 
   * change debian sub version number to 0 
 
- -- German Tischler <baer@german-pc>  Sun, 24 Mar 2013 20:30:42 +0000
+ -- German Tischler <gt1@sanger.ac.uk>  Sun, 24 Mar 2013 20:30:42 +0000
 
 bambamc (0.0.45-1) unstable; urgency=low
 
   * split package into runtime and dev part 
 
- -- German Tischler <baer@german-pc>  Sat, 23 Mar 2013 22:15:00 +0000
+ -- German Tischler <gt1@sanger.ac.uk>  Sat, 23 Mar 2013 22:15:00 +0000
 
 bambamc (0.0.44-1) UNRELEASED; urgency=low
 
