@@ -52,10 +52,6 @@ int BamBam_BamHeaderInfo_ProduceHeaderText(BamBam_BamHeaderInfo * info)
 	
 	if ( info->plaintext )
 		BamBam_CharBuffer_PushString(buffer,info->plaintext,ret); if ( ret < 0 ) return -1;	
-
-	/* terminating NUL character */	
-	if ( ret >= 0 )
-		ret = BamBam_CharBuffer_PushChar(buffer,0);
 	
 	return ret;
 }
