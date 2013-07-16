@@ -1,3 +1,9 @@
+bambamc (0.0.47-0) unstable; urgency=low
+
+  * bump version after removing trailing null character from sam/bam header 
+
+ -- German Tischler <gt1@sanger.ac.uk>  Tue, 16 Jul 2013 09:19:25 +0100
+
 bambamc (0.0.46-0) unstable; urgency=low
 
   * change debian sub version number to 0 
