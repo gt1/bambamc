@@ -439,6 +439,12 @@ BamBam_BamCollationHashEntry * BamBam_BamCollator_GetNextRead(BamBam_BamCollator
 
 enum tmpdirstate { BAMBAM_TMPDIR_FAILED = 1, BAMBAM_TMPDIR_CREATED = 2, BAMBAM_TMPDIR_WASPRESENT = 3 };
 
+#include <bambamc/BamBam_Config.h>
+
+#if defined(HAVEWINDOWS_MKDIR)
+#include <direct.h>
+#endif
+
 /* for stat() */
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -453,7 +459,11 @@ static int BamBam_CreateTempDir(char const * tmpdirname)
 	
 	if ( statret == -1 && errno == ENOENT )
 	{
+		#if defined(HAVEWINDOWS_MKDIR)
+		if ( ! _mkdir(tmpdirname) )
+		#else
 		if ( ! mkdir(tmpdirname, 0700) )
+		#endif
 		{
 			return BAMBAM_TMPDIR_CREATED;
 		}

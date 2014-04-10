@@ -116,7 +116,7 @@ void samBamSamTest()
 	while ( (algn = BamBam_SamBamFileDecoder_DecodeAlignment(samdec)) )
 	{
 		char const * name = BamBam_BamSingleAlignment_GetReadName(algn);
-		// fprintf(stderr,"%s\n", name);
+		fprintf(stderr,"%s\n", name);
 		if ( ++c % (1024*1024) == 0 )
 			fprintf(stderr,"%d\n", (int)(c/(1024*1024)) );
 	}
@@ -124,11 +124,22 @@ void samBamSamTest()
 	BamBam_SamBamFileDecoder_Delete(samdec);
 }
 
+#if defined(_WIN32)
+# include <io.h>
+# include <fcntl.h>
+# define SET_BINARY_MODE(handle) _setmode(_fileno(handle), O_BINARY)
+#else
+# define SET_BINARY_MODE(handle) ((void)0)
+#endif
+
 int main(/* int argc, char * argv[] */)
 {
-	// runCollationTest();	
+	SET_BINARY_MODE(stdin);
+	SET_BINARY_MODE(stdout);
+
+	runCollationTest();	
 	/* lineBufferTest(); */
-	samBamSamTest();
+	// samBamSamTest();
 		
 	return EXIT_SUCCESS;
 }

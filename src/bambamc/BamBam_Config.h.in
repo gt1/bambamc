@@ -19,4 +19,6 @@
 #if ! defined(BAMBAMC_CONFIG_H)
 #define BAMBAMC_CONFIG_H
 
+@HAVEWINDOWS_MKDIR@
+
 #endif

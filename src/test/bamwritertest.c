@@ -67,8 +67,19 @@ int testLibBamFree(char const * filename)
 	return 0;
 }
 
+#if defined(_WIN32)
+# include <io.h>
+# include <fcntl.h>
+# define SET_BINARY_MODE(handle) _setmode(_fileno(handle), O_BINARY)
+#else
+# define SET_BINARY_MODE(handle) ((void)0)
+#endif
+
 int main()
 {
+	SET_BINARY_MODE(stdin);
+	SET_BINARY_MODE(stdout);
+
 	return testLibBamFree("-");
 	return 0;
 }
