@@ -143,13 +143,12 @@ if test "${have_mkdir}" = "yes" -a "${have_direct_h}" = "yes" ; then
 AC_MSG_CHECKING([whether we can compile a program using _mkdir])
         AC_TRY_LINK([#include <direct.h>],[_mkdir("tmpdir");],[have_mkdir=yes],[have_mkdir=no])
         AC_MSG_RESULT([${have_mkdir}])
-
 fi
 
-if test "${have_mkdir}" ; then
+if test "${have_mkdir}" = "yes" ; then
 	HAVEWINDOWS_MKDIR="#define HAVEWINDOWS_MKDIR"
 else
-	HAVEWINDOWS_MKDIR
+	HAVEWINDOWS_MKDIR=
 fi
 
 PACKAGE_NAME=${PACKAGE}
