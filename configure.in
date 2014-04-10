@@ -135,6 +135,23 @@ else
 	fi
 fi
 
+AC_CHECK_FUNC([_mkdir],[have_mkdir=yes],[have_mkdir=no])
+AC_CHECK_HEADER([direct.h],[have_direct_h=yes],[have_direct_h=no])
+
+if test "${have_mkdir}" = "yes" -a "${have_direct_h}" = "yes" ; then
+
+AC_MSG_CHECKING([whether we can compile a program using _mkdir])
+        AC_TRY_LINK([#include <direct.h>],[_mkdir("tmpdir");],[have_mkdir=yes],[have_mkdir=no])
+        AC_MSG_RESULT([${have_mkdir}])
+
+fi
+
+if test "${have_mkdir}" ; then
+	HAVEWINDOWS_MKDIR="#define HAVEWINDOWS_MKDIR"
+else
+	HAVEWINDOWS_MKDIR
+fi
+
 PACKAGE_NAME=${PACKAGE}
 PACKAGE_VERSION=${VERSION}
 
@@ -145,4 +162,5 @@ AC_SUBST([ZLIBLIBS])
 AC_SUBST([ZLIBPKGLIBS])
 AC_SUBST([ZLIBREQ])
 AC_SUBST([LIBRARY_VERSION])
+AC_SUBST([HAVEWINDOWS_MKDIR])
 AC_OUTPUT(Makefile src/Makefile ubuntu.sh bambamc.pc src/bambamc/BamBam_Config.h)
