@@ -10,18 +10,25 @@ awk -v first=${FIRST} -v second=${SECOND} -v third=${THIRD} '/^AC_INIT/ {gsub(fi
 	> configure.in.tmp
 mv configure.in.tmp configure.in
 
+pushd ../bambamc-debian
+git checkout master
+git pull
 pushd debian
 export DEBEMAIL=gt1@sanger.ac.uk
 export DEBFULLNAME="German Tischler"
-dch --distribution unstable -v ${FIRST}.${SECOND}.${NEXTTHIRD}-0
+dch --distribution unstable -v ${FIRST}.${SECOND}.${NEXTTHIRD}
 dch --release
-#dch --distribution UNRELEASED -v ${FIRST}.${SECOND}.${NEXTTHIRD}-1
+# dch --release -v ${FIRST}.${SECOND}.${NEXTTHIRD}-1
+popd
+git add debian/changelog
+git commit
+git push
 popd
 
-git add debian/changelog
 git add configure.in
 git commit
 git push
 
-git tag -a bambamc_${FIRST}_${SECOND}_${NEXTTHIRD} -m "bambamc version ${FIRST}_${SECOND}_${NEXTTHIRD}"
-git push origin bambamc_${FIRST}_${SECOND}_${NEXTTHIRD}
+TAG=bambamc_${FIRST}_${SECOND}_${NEXTTHIRD}
+git tag -a ${TAG} -m "bambamc version ${FIRST}_${SECOND}_${NEXTTHIRD}"
+git push origin ${TAG}
