@@ -241,8 +241,17 @@ int BamBam_CharBuffer_PutAlignmentC(
 		return ret;
 				
 	/* encode quality */
-	for ( i = 0; i < quallen && ret >= 0; ++i )
-		BamBam_CharBuffer_PushCharQuick(buffer,qual[i]-33,ret);
+	if ( qual )
+	{
+		for ( i = 0; i < quallen && ret >= 0; ++i )
+			BamBam_CharBuffer_PushCharQuick(buffer,qual[i]-33,ret);
+	}
+	/* no quality given */
+	else
+	{
+		for ( i = 0; i < quallen && ret >= 0; ++i )
+			BamBam_CharBuffer_PushCharQuick(buffer,255,ret);
+	}
 		
 	if ( ret < 0 )
 		return ret;	
