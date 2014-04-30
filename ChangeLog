@@ -1,0 +1,4 @@
+bambamc (0.0.50)
+
+  * add support for null quality pointers when constructing alignments using
+    PutAlignment
