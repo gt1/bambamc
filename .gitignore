@@ -32,4 +32,11 @@ m4/lt~obsolete.m4
 maccombined.sh
 src/.deps/
 stamp-h1
-
+ubuntu.sh
+src/*.lo
+src/*.la
+src/bambamc/BamBam_Config.h
+bambamc.pc
+src/bamreadertest
+src/bamwritertest
+src/.libs/
