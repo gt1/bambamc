@@ -59,6 +59,23 @@ int testLibBamFree(char const * filename)
 	
 	r = BamBam_BamWriter_Commit(writer);
 	assert ( r >= 0 );
+
+	r = BamBam_BamWriter_PutAlignment(
+		writer,
+		0,
+		0,
+		5000,
+		-1,
+		0,
+		"readname_noqual",
+		"ACGTTGCA",
+		0,
+		"8M",
+		60,
+		100);
+	assert ( r >= 0 );
+	r = BamBam_BamWriter_Commit(writer);
+	assert ( r >= 0 );
 	
 	BamBam_BamWriter_Delete(writer,&status);
 	assert ( status >= 0 );
