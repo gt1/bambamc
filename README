@@ -1,10 +1,1 @@
-This package contains mainly a lightwight C implementation of the read name
-collation code from the larger bambam C++ project (see
-ftp://ftp.sanger.ac.uk/pub/users/gt1).
-
-The gibhub repository does not contain the final configure script but only
-the source files passed to autoconf/automake. Please use
-
-autoreconf -i -f
-
-to obtain a set of working configuration scripts.
+Please see README.md.
