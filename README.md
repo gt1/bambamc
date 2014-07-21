@@ -20,6 +20,8 @@ And installed using
 
 	make install
 
+Installation may require root privileges.
+
 An alternative installation path can be set using
 
 	./configure --prefix=/path/to/installation
