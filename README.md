@@ -16,7 +16,7 @@ The library can then be compiled using
 	./configure
 	make
 
-And installed using
+and installed using
 
 	make install
 
