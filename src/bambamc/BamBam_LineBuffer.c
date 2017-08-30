@@ -110,7 +110,7 @@ int BamBam_LineBuffer_GetLine(BamBam_LineBuffer * object, char const **a, char c
 						object->bufferptrout = object->bufferptrin;
 						return 0;
 					}
-					/* otherwise we append an artifical newline */
+					/* otherwise we append an artificial newline */
 					else
 					{
 						uint64_t const numbytes = lineend - object->bufferptrout;
